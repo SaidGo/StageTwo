@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Legal Entity API
+  version: "1.0"
+paths:
+  /legal-entities:
+    get:
+      summary: Get all legal entities
+      tags:
+        - federation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LegalEntity'
+components:
+  schemas:
+    LegalEntity:
+      type: object
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+        inn:
+          type: string
+        kpp:
+          type: string
+        ogrn:
+          type: string
+        address:
+          type: string

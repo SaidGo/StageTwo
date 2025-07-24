@@ -1,0 +1,37 @@
+# === Go build artifacts ===
+*.exe
+*.test
+*.out
+*.log
+*.db
+*.bak
+
+# === Go vendor directory ===
+vendor/
+
+# === IDE/editor configs ===
+.vscode/
+.idea/
+*.sw?
+*~
+*.DS_Store
+
+# === Project binaries ===
+/web.exe
+/migrate.exe
+
+# === Logs ===
+*.log
+
+# === Local/dev configuration files ===
+Study.study.json
+crm.environment.json
+
+# === Migration backups ===
+/migrations_pg_bak/
+/migrations_sqlite/
+
+# === OS/Editor-specific ===
+Thumbs.db
+ehthumbs.db
+Desktop.ini
