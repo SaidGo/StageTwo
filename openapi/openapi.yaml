@@ -2,12 +2,16 @@ openapi: 3.0.3
 info:
   title: Legal Entity API
   version: "1.0"
+
 paths:
   /legal-entities:
     get:
       summary: Get all legal entities
       tags:
         - federation
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       responses:
         '200':
           description: OK
@@ -17,20 +21,140 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LegalEntity'
+    post:
+      summary: Create legal entity
+      tags:
+        - federation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLegalEntity'
+      responses:
+        '201':
+          description: Created legal entity with generated UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+
+  /legal-entities/{uuid}:
+    get:
+      summary: Get legal entity by UUID
+      tags:
+        - federation
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+
+    put:
+      summary: Update legal entity by UUID
+      tags:
+        - federation
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLegalEntity'
+      responses:
+        '200':
+          description: Updated legal entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+
+    delete:
+      summary: Delete legal entity by UUID
+      tags:
+        - federation
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: Deleted
+
 components:
   schemas:
+    UUID:
+      type: string
+      format: uuid
+      description: UUID в формате RFC 4122
+
     LegalEntity:
       type: object
       properties:
         uuid:
-          type: string
+          $ref: '#/components/schemas/UUID'
+          description: Уникальный идентификатор юридического лица
         name:
           type: string
-        inn:
+          description: Название юридического лица
+        created_at:
           type: string
-        kpp:
+          format: date-time
+          description: Дата и время создания записи
+        updated_at:
           type: string
-        ogrn:
+          format: date-time
+          description: Дата и время последнего обновления записи
+
+    CreateLegalEntity:
+      type: object
+      required:
+        - name
+      properties:
+        name:
           type: string
-        address:
+          description: Название юридического лица
+
+    UpdateLegalEntity:
+      type: object
+      required:
+        - name
+      properties:
+        name:
           type: string
+          description: Новое название юридического лица
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: Максимальное количество возвращаемых элементов (для пагинации)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 50
+    offset:
+      name: offset
+      in: query
+      description: Смещение от начала выборки (для пагинации)
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0

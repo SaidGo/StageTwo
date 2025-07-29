@@ -4,20 +4,24 @@
 package app
 
 import (
-	"example.com/local/Go2part/internal/legalentities"
-	"example.com/local/Go2part/internal/web"
-	"example.com/local/Go2part/pkg/postgres"
-
 	"github.com/google/wire"
+
+	"example.com/local/Go2part/internal/legalentities"
+	"example.com/local/Go2part/internal/web/olegalentity"
 )
 
-func InitLegalEntityHandler(dsn string) *web.LegalEntityHandler {
-	wire.Build(
-		postgres.NewSQLiteConnection,
-		legalentities.NewGormRepository,
-		wire.Bind(new(legalentities.Repository), new(*legalentities.GormRepository)),
-		legalentities.NewService,
-		web.NewLegalEntityHandler,
-	)
-	return nil
+var appSet = wire.NewSet(
+	NewApp,
+	NewRouter,
+	NewDB,
+	legalentities.NewRepository,
+	legalentities.NewService,
+	wire.Bind(new(legalentities.ServiceInterface), new(*legalentities.Service)),
+	olegalentity.NewLegalEntityHandler,
+	wire.Bind(new(olegalentity.ServerInterface), new(*olegalentity.LegalEntityHandler)),
+)
+
+func InitApp() (*App, error) {
+	wire.Build(appSet)
+	return nil, nil
 }

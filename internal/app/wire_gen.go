@@ -8,16 +8,33 @@ package app
 
 import (
 	"example.com/local/Go2part/internal/legalentities"
-	"example.com/local/Go2part/internal/web"
-	"example.com/local/Go2part/pkg/postgres"
+	"example.com/local/Go2part/internal/web/olegalentity"
+	"github.com/google/wire"
+)
+
+import (
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // Injectors from wire.go:
 
-func InitLegalEntityHandler(dsn string) *web.LegalEntityHandler {
-	db := postgres.NewSQLiteConnection(dsn)
-	gormRepository := legalentities.NewGormRepository(db)
-	service := legalentities.NewService(gormRepository)
-	legalEntityHandler := web.NewLegalEntityHandler(service)
-	return legalEntityHandler
+func InitApp() (*App, error) {
+	db, err := NewDB()
+	if err != nil {
+		return nil, err
+	}
+	repository := legalentities.NewRepository(db)
+	service := legalentities.NewService(repository)
+	legalEntityHandler := olegalentity.NewLegalEntityHandler(service)
+	engine := NewRouter(legalEntityHandler)
+	app := NewApp(engine)
+	return app, nil
 }
+
+// wire.go:
+
+var appSet = wire.NewSet(
+	NewApp,
+	NewRouter,
+	NewDB, legalentities.NewRepository, legalentities.NewService, wire.Bind(new(legalentities.ServiceInterface), new(*legalentities.Service)), olegalentity.NewLegalEntityHandler, wire.Bind(new(olegalentity.ServerInterface), new(*olegalentity.LegalEntityHandler)),
+)

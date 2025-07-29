@@ -1,17 +1,18 @@
 package main
 
 import (
-	"example.com/local/Go2part/internal/app"
-	"example.com/local/Go2part/internal/router"
+	"log"
 
-	"github.com/labstack/echo/v4"
+	"example.com/local/Go2part/internal/app"
 )
 
 func main() {
-	e := echo.New()
-	a := app.NewApp("legalentities.db")
+	a, err := app.InitApp()
+	if err != nil {
+		log.Fatalf("failed to initialize app: %v", err)
+	}
 
-	router.RegisterLegalEntityRoutes(e, a.LegalEntityHandler)
-
-	e.Logger.Fatal(e.Start(":8080"))
+	if err := a.Run(":8080"); err != nil {
+		log.Fatalf("failed to run app: %v", err)
+	}
 }
