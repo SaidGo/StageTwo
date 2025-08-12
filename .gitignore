@@ -59,3 +59,7 @@ internal/web/**/server.gen.go
 # ignore embedded repos
 migrate/
 
+
+# ignore embedded repos
+migrate/
+
