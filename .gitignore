@@ -1,37 +1,61 @@
-# === Go build artifacts ===
+# Go build artifacts
+bin/
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 *.test
 *.out
-*.log
-*.db
-*.bak
 
-# === Go vendor directory ===
+# Go modules
 vendor/
 
-# === IDE/editor configs ===
-.vscode/
-.idea/
-*.sw?
-*~
-*.DS_Store
-
-# === Project binaries ===
-/web.exe
-/migrate.exe
-
-# === Logs ===
+# Logs
 *.log
 
-# === Local/dev configuration files ===
-Study.study.json
-crm.environment.json
+# IDE / Editor
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
 
-# === Migration backups ===
-/migrations_pg_bak/
-/migrations_sqlite/
-
-# === OS/Editor-specific ===
+# OS generated
+.DS_Store
 Thumbs.db
-ehthumbs.db
-Desktop.ini
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Migration binaries
+migrate_bin/
+
+# Environment / Config
+*.environment.json
+crm.environment.json
+Study.study.json
+.pgpass
+*.pgpass
+*.pgpass.conf
+
+# Backup / temp files
+*.bak
+*.tmp
+~$*
+
+# Coverage / profiling
+*.coverprofile
+*.pprof
+
+# Generated code
+wire_gen.go
+internal/web/**/api.gen.go
+internal/web/**/model_gen.go
+internal/web/**/server.gen.go
+
+# ignore embedded repos
+migrate/
+
