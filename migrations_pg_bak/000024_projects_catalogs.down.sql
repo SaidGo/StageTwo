@@ -1,1 +1,0 @@
-DROP TABLE if exists project_catalog_data;
