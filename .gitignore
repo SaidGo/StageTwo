@@ -63,3 +63,10 @@ migrate/
 # ignore embedded repos
 migrate/
 
+web.exe
+legalentities.db
+migrate.exe
+migrations_pg_bak/
+migrations_sqlite/
+migrations_disabled/
+*.zip
