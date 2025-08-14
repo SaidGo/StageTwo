@@ -34,7 +34,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	go.opentelemetry.io/otel/trace v1.37.0
 	golang.org/x/crypto v0.40.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
 	golang.org/x/sync v0.16.0
 	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.6.0
