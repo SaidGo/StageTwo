@@ -1,5 +1,6 @@
 # Go build artifacts
-bin/
+/bin/
+/web.exe
 *.exe
 *.exe~
 *.dll
@@ -9,7 +10,7 @@ bin/
 *.out
 
 # Go modules
-vendor/
+/vendor/
 
 # Logs
 *.log
@@ -29,17 +30,22 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
+/legalentities.db
 
-# Migration binaries
-migrate_bin/
+# Migration binaries and embedded repos
+/migrate_bin/
+/migrate/
+migrate.exe
 
-# Environment / Config
+# Environment / Config (local only)
 *.environment.json
 crm.environment.json
 Study.study.json
 .pgpass
 *.pgpass
 *.pgpass.conf
+.env
+.env.local
 
 # Backup / temp files
 *.bak
@@ -50,6 +56,7 @@ Study.study.json
 *.coverprofile
 *.pprof
 
+<<<<<<< HEAD
 # Generated code
 wire_gen.go
 internal/web/**/api.gen.go
@@ -70,3 +77,7 @@ migrations_pg_bak/
 migrations_sqlite/
 migrations_disabled/
 *.zip
+=======
+# OpenAPI generator temp
+openapi/.openapi
+>>>>>>> bd0dddb (cleanup)
