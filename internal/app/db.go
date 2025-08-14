@@ -1,9 +1,9 @@
 package app
 
 import (
+	_ "github.com/mattn/go-sqlite3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func NewDB() (*gorm.DB, error) {

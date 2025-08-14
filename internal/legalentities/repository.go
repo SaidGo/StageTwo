@@ -2,9 +2,10 @@ package legalentities
 
 import (
 	"context"
-	"gorm.io/gorm"
-	"time"
 	"log"
+	"time"
+
+	"gorm.io/gorm"
 )
 
 type Repository interface {

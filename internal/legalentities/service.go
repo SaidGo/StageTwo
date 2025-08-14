@@ -2,11 +2,12 @@ package legalentities
 
 import (
 	"context"
+
 	"example.com/local/Go2part/domain"
 	"github.com/google/uuid"
 )
 
-// Интерфейс сервиса
+// Интерфейс сервиса.
 type ServiceInterface interface {
 	GetAllLegalEntities(ctx context.Context) ([]*domain.LegalEntity, error)
 	CreateLegalEntity(ctx context.Context, entity *domain.LegalEntity) error
@@ -14,7 +15,7 @@ type ServiceInterface interface {
 	DeleteLegalEntity(ctx context.Context, uuid string) error
 }
 
-// Реализация сервиса
+// Реализация сервиса.
 type Service struct {
 	repo Repository
 }

@@ -289,7 +289,6 @@ func (r *Repository) GetCatalogsByCompany(uid uuid.UUID) (orm []Catalog, err err
 		Where("company_uuid = ?", uid).
 		Where("deleted_at is null").
 		Find(&orm).Error
-
 	if err != nil {
 		return orm, err
 	}

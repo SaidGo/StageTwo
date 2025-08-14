@@ -23,7 +23,7 @@ func NewLegalEntityHandler(service legalentities.ServiceInterface) *LegalEntityH
 
 var _ ServerInterface = &LegalEntityHandler{}
 
-// uuidToString конвертирует [16]byte UUID в строку с дефисами
+// uuidToString конвертирует [16]byte UUID в строку с дефисами.
 func uuidToString(uuid UUID) string {
 	return fmt.Sprintf("%x-%x-%x-%x-%x",
 		uuid[0:4],
@@ -138,7 +138,7 @@ func (h *LegalEntityHandler) DeleteLegalEntity(c *gin.Context, uuid UUID) {
 	c.Status(http.StatusNoContent)
 }
 
-// Aliases for OpenAPI compatibility
+// Aliases for OpenAPI compatibility.
 func (h *LegalEntityHandler) DeleteLegalEntitiesUuid(c *gin.Context, uuid UUID) {
 	h.DeleteLegalEntity(c, uuid)
 }

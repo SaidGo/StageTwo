@@ -10,9 +10,7 @@ import (
 	"example.com/local/Go2part/internal/legalentities"
 	"example.com/local/Go2part/internal/web/olegalentity"
 	"github.com/google/wire"
-)
 
-import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
