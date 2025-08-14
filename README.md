@@ -1,80 +1,58 @@
-# Go2part — Legal Entity CRUD (Этап 2.1)
+# Go2part
 
-## 📌 Цель
-Реализация CRUD для юридических лиц (`Legal Entity`) в рамках архитектуры:
+## Описание
+Go2part — backend-сервис, реализующий многоуровневую архитектуру **Federation → Company → Legal Entity → Bank Account** с использованием Go, GORM, Gin, OpenAPI и миграций.
 
-Federation
-└── Company
-└── Legal Entity
-└── Bank Account (в будущем)
+## Структура проекта
+```
+cmd/               # CLI и Web точки входа
+domain/            # Доменные сущности
+dto/               # DTO для API
+internal/          # Логика по доменам
+  ├─ legalentities # CRUD Legal Entity
+  ├─ company       # Логика компаний
+  ├─ federation    # Логика федераций
+  ├─ web           # OpenAPI-хендлеры и middleware
+migrations/        # SQL-миграции
+openapi/           # OpenAPI-описания
+pkg/               # Инфраструктурные пакеты (postgres, cache, redis и др.)
+scripts/           # Скрипты генерации и обслуживания
+```
 
-markdown
-Копировать
+## Основные команды
+```bash
+# Сборка web-сервера
+go build ./cmd/web
 
-## 🏗️ Структура проекта
+# Сборка CLI
+go build ./cmd/cli
 
-- `internal/legalentities/`
-  - `orm.go` — описание модели
-  - `repository.go` — доступ к БД
-  - `main.go` — сервис
-- `internal/web/legal_entity_handler.go` — HTTP-хендлеры
-- `internal/router/routers-legal-entities.go` — маршруты
-- `migrations/000001_create_legal_entities.*.sql` — SQLite миграции
-- `internal/web/olegalentity/` — автогенерируемый API-интерфейс по OpenAPI
-- `openapi/openapi.yaml` — описание API
+# Генерация OpenAPI
+make gen-openapi
 
-## 🧪 Примеры запросов (Postman)
+# Применение миграций (SQLite)
+make migrate-up-sqlite
 
-### 🔹 Создание
-```http
-POST /legal-entities
-Content-Type: application/json
+# Применение миграций (PostgreSQL)
+make migrate-up-pg
 
-{
-  "name": "ООО Пример"
-}
-🔹 Получение всех
-http
-Копировать
-GET /legal-entities
-🔹 Обновление
-http
-Копировать
-PUT /legal-entities/{uuid}
-Content-Type: application/json
+# Очистка
+make clean
 
-{
-  "name": "АО Обновлено"
-}
-🔹 Удаление
-http
-Копировать
-DELETE /legal-entities/{uuid}
-⚙️ Сборка и запуск
-bash
-Копировать
-# Генерация wire
-go generate ./...
+# Генерация Wire
+make wire
+```
 
-# Сборка
-go build -o web.exe ./cmd/web
+## Пример запуска (SQLite)
+```bash
+make build
+make migrate-up-sqlite
+./web
+```
 
-# Запуск
-./web.exe
-🗃️ Миграции
-bash
-Копировать
-# Применить миграции
-./migrate.exe -database "sqlite3://E:/Projects/Go2part/legalentities.db" -path ./migrations up
-
-# Проверить таблицу
-sqlite3 legalentities.db ".tables"
-🧱 Зависимости
-Go >= 1.21
-
-SQLite
-
-migrate (CLI)
-
-🧾 Лицензия
-MIT
+## Требования
+- Go >= 1.21
+- SQLite3 / PostgreSQL
+- make / bash-окружение (MSYS под Windows)
+- Wire
+- OpenAPI Generator

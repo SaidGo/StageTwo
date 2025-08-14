@@ -4,10 +4,10 @@
 package app
 
 import (
-	"github.com/google/wire"
-
 	"example.com/local/Go2part/internal/legalentities"
 	"example.com/local/Go2part/internal/web/olegalentity"
+
+	"github.com/google/wire"
 )
 
 var appSet = wire.NewSet(

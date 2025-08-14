@@ -67,43 +67,30 @@ func MinOf(nums ...int) int {
 
 func Map[T any, R any](collection []T, iteratee func(item T, index int) R) []R {
 	result := make([]R, len(collection))
-
 	for i, item := range collection {
 		result[i] = iteratee(item, i)
 	}
-
 	return result
 }
 
-func Ptr[T any](a T) *T {
-	return &a
-}
+func Ptr[T any](a T) *T { return &a }
 
 func Empty[T any](a T, found bool) *T {
 	if !found {
 		return nil
 	}
-
 	return &a
 }
 
-func UUID() string {
-	id := uuid.New()
+func UUID() string { return uuid.New().String() }
 
-	return id.String()
-}
+func UID() uuid.UUID { return uuid.New() }
 
-func UID() uuid.UUID {
-	id := uuid.New()
-
-	return id
-}
-
+// ВАЖНО: generic-сравнение только для упорядочиваемых типов.
 func Min[T constraints.Ordered](a, b T) T {
 	if a < b {
 		return a
 	}
-
 	return b
 }
 
@@ -113,31 +100,18 @@ func InArray[T comparable](s T, arr []T) bool {
 			return true
 		}
 	}
-
 	return false
 }
 
-func Join(arr []string, del string) string {
-	return strings.Join(arr, del)
-}
+func Join(arr []string, del string) string { return strings.Join(arr, del) }
 
-func DateNow() string {
-	return time.Now().Format(time.RFC3339)
-}
-
-func DateNowMilli() int64 {
-	return time.Now().UnixMilli()
-}
-
-func DateNowNanosecond() int {
-	return time.Now().Nanosecond()
-}
-
+func DateNow() string        { return time.Now().Format(time.RFC3339) }
+func DateNowMilli() int64    { return time.Now().UnixMilli() }
+func DateNowNanosecond() int { return time.Now().Nanosecond() }
 func Default[T any](v *T, def T) T {
 	if v == nil {
 		return def
 	}
-
 	return *v
 }
 
@@ -145,72 +119,53 @@ func IsValidUUID(u string) bool {
 	if len(u) != 36 {
 		return false
 	}
-
 	_, err := uuid.Parse(u)
 	return err == nil
 }
 
-//
-
 func RandomPartFromSlice[T any](arr []T) (bool, []T) {
 	var result []T
-
 	if len(arr) == 0 {
 		return false, result
 	}
-
 	for i := 0; i < len(arr); i++ {
 		if i%3 == 0 {
 			result = append(result, arr[i])
 		}
 	}
-
 	return true, result
 }
 
 func RandomFromSlice[T any](arr []T) (bool, T) {
 	var result T
-
 	if len(arr) == 0 {
 		return false, result
 	}
-
 	if len(arr) == 1 {
 		return false, arr[0]
 	}
-
-	//nolint // it is ok
+	//nolint:gosec // псевдослучайность для утилитарных нужд ок
 	idx := rand.Intn(len(arr))
-
 	return true, arr[idx]
 }
 
 func RandomNumber(min, max int) int {
-	//nolint // it is ok
+	//nolint:gosec
 	return rand.Intn(max) + min
 }
 
-func RandomBigNumber() int {
-	return RandomNumber(0, 1000000)
-}
+func RandomBigNumber() int { return RandomNumber(0, 1_000_000) }
 
 func UUIDByHash(s string) string {
-	id := uuid.NewSHA1(uuid.UUID{}, []byte(s))
-
-	return id.String()
+	return uuid.NewSHA1(uuid.UUID{}, []byte(s)).String()
 }
 
 func UUIDByTwoStrings(s1, s2 string) string {
-	sorted := ""
+	sorted := s2 + "." + s1
 	if s1 < s2 {
 		sorted = s1 + "." + s2
-	} else {
-		sorted = s2 + "." + s1
 	}
-
-	id := uuid.NewSHA1(uuid.UUID{}, []byte(sorted))
-
-	return id.String()
+	return uuid.NewSHA1(uuid.UUID{}, []byte(sorted)).String()
 }
 
 func GetType(s interface{}) string {
@@ -221,46 +176,26 @@ func GetType(s interface{}) string {
 	return t.Name()
 }
 
-//
-
 // Return sorted keys.
 func SortMapByKeys[T constraints.Ordered](mp map[T]any) []T {
 	keys := make([]T, 0, len(mp))
 	for k := range mp {
 		keys = append(keys, k)
 	}
-
-	lenCmp := func(a, b T) int {
-		if a < b {
-			return -1
-		}
-
-		return 1
-	}
-
-	slices.SortFunc(keys, lenCmp)
-
+	slices.Sort(keys)
 	return keys
 }
 
-//
-
 func RemoveTagsFromString(s string) string {
 	ind := strings.LastIndex(s, "]") + 1
-
 	return strings.Trim(s[ind:], " ")
 }
 
-//
-
 func ConvertPostgresCreds(creds string) (string, error) {
 	logrus.Debug(creds)
-	// parse string: postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable
-
+	// postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable...
 	pattern := regexp.MustCompile(`postgres://(?P<user>[^:]+):(?P<password>[^@]+)@(?P<host>[^:]+):(?P<port>[^/]+)/(?P<dbname>[^?]+)(\?sslmode=(?P<sslmode>[^&]+)&sslrootcert=(?P<sslrootcert>[^&]+))*`)
-
 	sub := pattern.FindStringSubmatch(creds)
-	connStr := ""
 	if len(sub) < 6 {
 		logrus.Debug("postgres creds", sub)
 		return "", fmt.Errorf("invalid postgres connection string")
@@ -269,28 +204,24 @@ func ConvertPostgresCreds(creds string) (string, error) {
 	user := sub[1]
 	password := sub[2]
 	host := sub[3]
-
 	port, err := strconv.Atoi(sub[4])
 	if err != nil {
 		return "", err
 	}
-
 	dbName := sub[5]
-
-	//
-
-	sslMode := sub[7]
-	sslCert := sub[8]
-
-	if sslCert != "" {
-		connStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s sslrootcert=%s",
-			host, port, user, password, dbName, sslMode, sslCert)
-	} else {
-		connStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-			host, port, user, password, dbName)
+	sslMode := ""
+	sslCert := ""
+	if len(sub) >= 9 {
+		sslMode = sub[7]
+		sslCert = sub[8]
 	}
 
-	return connStr, nil
+	if sslCert != "" {
+		return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s sslrootcert=%s",
+			host, port, user, password, dbName, sslMode, sslCert), nil
+	}
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbName), nil
 }
 
 func Hash(password string) string {
@@ -308,27 +239,23 @@ func VerifyHash(hashed, password string) error {
 
 func RemoteTagsFromError(msg string) string {
 	l := 0
-
-	if msg[0] == '[' {
+	if len(msg) > 0 && msg[0] == '[' {
 		for i, c := range msg {
-			if i-1 != len(msg) && c == ']' && msg[i+1] == ' ' {
+			if i-1 != len(msg) && c == ']' && i+1 < len(msg) && msg[i+1] == ' ' {
 				l = i
 				break
 			}
 		}
-
 		return msg[l+2:]
 	}
-
 	return msg
 }
 
 func RandomCode(length int) string {
 	letters := []rune("abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
 	b := make([]rune, length)
 	for i := range b {
-		//nolint // it is ok
+		//nolint:gosec
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
@@ -336,130 +263,86 @@ func RandomCode(length int) string {
 
 func RandomNumCode(length int) string {
 	letters := []rune("123456789")
-
 	b := make([]rune, length)
 	for i := range b {
-		//nolint // it is ok
+		//nolint:gosec
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
 }
 
-func GenerateValidationSimpleCode() string {
-	return RandomNumCode(6)
-}
+func GenerateValidationSimpleCode() string { return RandomNumCode(6) }
+func GenerateValidationCode() string       { return RandomNumCode(20) }
+func GenerateResetCode() string            { return RandomCode(20) }
 
-func GenerateValidationCode() string {
-	return RandomNumCode(20)
-}
+func ToSnake(str string) string      { return strcase.ToSnake(str) }
+func ToLowerSnake(str string) string { return strings.ToLower(strcase.ToSnake(str)) }
 
-func GenerateResetCode() string {
-	return RandomCode(20)
-}
-
-func ToSnake(str string) string {
-	return strcase.ToSnake(str)
-}
-
-func ToLowerSnake(str string) string {
-	return strings.ToLower(strcase.ToSnake(str))
-}
-
-func ParsePathFileName(path string) string {
-	return strings.TrimSuffix(path, filepath.Ext(path))
-}
-
-func ParsePathExt(path string) string {
-	return filepath.Ext(path)
-}
-
-func ParsePathBase(path string) string {
-	return filepath.Base(path)
-}
+func ParsePathFileName(path string) string { return strings.TrimSuffix(path, filepath.Ext(path)) }
+func ParsePathExt(path string) string      { return filepath.Ext(path) }
+func ParsePathBase(path string) string     { return filepath.Base(path) }
 
 func PathInsertSize(path string, size int) string {
 	if size == 0 {
 		return path
 	}
-
 	fileName := ParsePathFileName(path)
 	ext := filepath.Ext(path)
-
 	return fmt.Sprintf("%s.w%d%s", fileName, size, ext)
 }
 
 func IntToLetters(number int) (letters string) {
 	number--
-
 	if firstLetter := number / 26; firstLetter > 0 {
 		letters += IntToLetters(firstLetter)
 		letters += string(rune('a' + number%26))
 	} else {
 		letters += string(rune('a' + number))
 	}
-
 	return letters
 }
 
 func GetMapKeys[T comparable](mymap map[T]interface{}) []T {
-	keys := make([]T, len(mymap))
-
-	i := 0
+	keys := make([]T, 0, len(mymap))
 	for k := range mymap {
-		keys[i] = k
-		i++
+		keys = append(keys, k)
 	}
-
 	return keys
 }
 
 func ArrayIntersection(a1, a2 []string) []string {
 	res := []string{}
-
-	longestArr := a1
-	shortestArr := a2
+	longestArr, shortestArr := a1, a2
 	if len(a1) < len(a2) {
-		longestArr = a2
-		shortestArr = a1
+		longestArr, shortestArr = a2, a1
 	}
-
-	keys := make(map[string]bool)
-
+	keys := make(map[string]bool, len(shortestArr))
 	for _, k := range shortestArr {
 		keys[k] = true
 	}
-
 	for _, k := range longestArr {
-		if _, ok := keys[k]; ok {
+		if keys[k] {
 			res = append(res, k)
 		}
 	}
-
 	return res
 }
 
 func ArrayNonIntersection(a1, a2 []string) []string {
 	res := []string{}
-
-	longestArr := a1
-	shortestArr := a2
+	longestArr, shortestArr := a1, a2
 	if len(a1) < len(a2) {
-		longestArr = a2
-		shortestArr = a1
+		longestArr, shortestArr = a2, a1
 	}
-
-	keys := make(map[string]bool)
-
+	keys := make(map[string]bool, len(shortestArr))
 	for _, k := range shortestArr {
 		keys[k] = true
 	}
-
 	for _, k := range longestArr {
-		if _, ok := keys[k]; !ok {
+		if !keys[k] {
 			res = append(res, k)
 		}
 	}
-
 	return res
 }
 
@@ -468,7 +351,6 @@ func FileMimetype(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return mtype.String(), nil
 }
 
@@ -477,7 +359,6 @@ func FileIsImage(path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
 	return FileMimeIsImage(mtype.String()), nil
 }
 
@@ -494,20 +375,16 @@ func FileSize(path string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	return f.Size(), nil
 }
 
-func FileExt(path string) string {
-	return filepath.Ext(path)
-}
+func FileExt(path string) string { return filepath.Ext(path) }
 
 func MustInt(i string) int {
 	v, err := strconv.Atoi(i)
 	if err != nil {
 		return -1
 	}
-
 	return v
 }
 
@@ -515,42 +392,21 @@ func PatchPath(parent, current string, path []string) []string {
 	if len(path) == 0 {
 		return lo.Uniq([]string{parent, current})
 	}
-
 	res := []string{}
 	for _, a := range lo.Uniq(path) {
 		if a == current {
 			res = append(res, parent)
 		}
-
 		if a != parent {
 			res = append(res, a)
 		}
 	}
-
 	return res
 }
 
-func Unique[T comparable](arr []T) []T {
-	return lo.Uniq(arr)
-}
+func Unique[T comparable](arr []T) []T { return lo.Uniq(arr) }
 
-// Alloc uint64
-// Alloc is bytes of allocated heap objects.
-// "Allocated" heap objects include all reachable objects, as well as unreachable objects that the garbage collector has not yet freed.
-// Specifically, Alloc increases as heap objects are allocated and decreases as the heap is swept and unreachable objects are freed.
-// Sweeping occurs incrementally between GC cycles, so these two processes occur simultaneously, and as a result Alloc tends to change smoothly (in contrast with the sawtooth that is typical of stop-the-world garbage collectors).
-//
-// TotalAlloc uint64
-// TotalAlloc is cumulative bytes allocated for heap objects.
-// TotalAlloc increases as heap objects are allocated, but unlike Alloc and HeapAlloc, it does not decrease when objects are freed.
-//
-// Sys uint64
-// Sys is the total bytes of memory obtained from the OS.
-// Sys is the sum of the XSys fields below. Sys measures the virtual address space reserved by the Go runtime for the heap, stacks, and other internal data structures. It's likely that not all of the virtual address space is backed by physical memory at any given moment, though in general it all was at some point.
-//
-// NumGC uint32
-// NumGC is the number of completed GC cycles.
-
+// Память процесса.
 func PrintMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
@@ -561,17 +417,13 @@ func PrintMemUsage() {
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
 
-func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
-}
+func bToMb(b uint64) uint64 { return b / 1024 / 1024 }
 
 func ToInterfaceMap[T any](mp map[string]T) map[string]interface{} {
-	res := make(map[string]interface{})
-
+	res := make(map[string]interface{}, len(mp))
 	for k, v := range mp {
 		res[k] = v
 	}
-
 	return res
 }
 
@@ -588,12 +440,11 @@ func EquelSlices[T comparable](a, b []T) bool {
 }
 
 func StructToMap(obj interface{}) (newMap map[string]interface{}, err error) {
-	data, err := json.Marshal(obj) // Convert to a json string
+	data, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
 	}
-
-	err = json.Unmarshal(data, &newMap) // Convert to a map
+	err = json.Unmarshal(data, &newMap)
 	return newMap, err
 }
 
@@ -619,7 +470,6 @@ func FindNewElements[T comparable](oldArray, newArray []T) []T {
 			res = append(res, n)
 		}
 	}
-
 	return res
 }
 
@@ -630,6 +480,5 @@ func FindRemovedElements[T comparable](oldArray, newArray []T) []T {
 			res = append(res, n)
 		}
 	}
-
 	return res
 }

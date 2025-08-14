@@ -27,7 +27,7 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 	return &GormRepository{db: db}
 }
 
-// Обёртка, если где-то используется именно NewRepository
+// Обёртка, если где-то используется именно NewRepository.
 func NewRepository(db *gorm.DB) Repository {
 	if err := AutoMigrate(db); err != nil {
 		panic(err)
@@ -62,7 +62,13 @@ func (r *GormRepository) Create(ctx context.Context, entity *domain.LegalEntity)
 }
 
 func (r *GormRepository) Update(ctx context.Context, entity *domain.LegalEntity) error {
-	return r.db.WithContext(ctx).Save(LegalEntityFromDomain(entity)).Error
+	return r.db.WithContext(ctx).
+		Model(&LegalEntityORM{}).
+		Where("uuid = ?", entity.UUID).
+		Updates(map[string]any{
+			"name":       entity.Name,
+			"updated_at": entity.UpdatedAt,
+		}).Error
 }
 
 func (r *GormRepository) Delete(ctx context.Context, uuid string) error {

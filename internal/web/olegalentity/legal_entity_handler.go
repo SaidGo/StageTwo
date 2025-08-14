@@ -77,10 +77,11 @@ func (h *LegalEntityHandler) CreateLegalEntity(c *gin.Context) {
 	c.JSON(http.StatusCreated, dto)
 }
 
+// ✔ Теперь читаем по UUID через доменный сервис, а не через List()+поиск
 func (h *LegalEntityHandler) GetLegalEntityByUUID(c *gin.Context, uuid UUID) {
 	id := uuidToString(uuid)
 
-	e, err := h.service.GetLegalEntity(c.Request.Context(), id)
+	entity, err := h.service.GetLegalEntity(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
@@ -89,12 +90,16 @@ func (h *LegalEntityHandler) GetLegalEntityByUUID(c *gin.Context, uuid UUID) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	if entity == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
 
 	dto := LegalEntityDTO{
-		UUID:      e.UUID,
-		Name:      e.Name,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		UUID:      entity.UUID,
+		Name:      entity.Name,
+		CreatedAt: entity.CreatedAt,
+		UpdatedAt: entity.UpdatedAt,
 	}
 	c.JSON(http.StatusOK, dto)
 }
@@ -109,15 +114,14 @@ func (h *LegalEntityHandler) UpdateLegalEntity(c *gin.Context, uuid UUID) {
 	entity := &domain.LegalEntity{
 		UUID: uuidToString(uuid),
 		Name: input.Name,
-		// CreatedAt не трогаем — прочтём после апдейта
 		// UpdatedAt выставит доменный сервис
+		UpdatedAt: time.Now(),
 	}
 	if err := h.service.UpdateLegalEntity(c.Request.Context(), entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Читаем актуальную запись (с правильным CreatedAt/UpdatedAt)
 	updated, err := h.service.GetLegalEntity(c.Request.Context(), entity.UUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

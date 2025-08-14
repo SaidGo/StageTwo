@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Сервисный интерфейс
+// Сервисный интерфейс.
 type ServiceInterface interface {
 	GetAllLegalEntities(ctx context.Context) ([]*domain.LegalEntity, error)
 	GetLegalEntity(ctx context.Context, uuid string) (*domain.LegalEntity, error) // NEW
@@ -17,7 +17,7 @@ type ServiceInterface interface {
 	DeleteLegalEntity(ctx context.Context, uuid string) error
 }
 
-// Сервисная реализация
+// Сервисная реализация.
 type Service struct {
 	repo Repository
 }
