@@ -78,25 +78,25 @@ func (h *LegalEntityHandler) CreateLegalEntity(c *gin.Context) {
 }
 
 func (h *LegalEntityHandler) GetLegalEntityByUUID(c *gin.Context, uuid UUID) {
-	list, err := h.service.GetAllLegalEntities(c.Request.Context())
+	id := uuidToString(uuid)
+
+	e, err := h.service.GetLegalEntity(c.Request.Context(), id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	uuidStr := uuidToString(uuid)
-	for _, e := range list {
-		if e.UUID == uuidStr {
-			dto := LegalEntityDTO{
-				UUID:      e.UUID,
-				Name:      e.Name,
-				CreatedAt: e.CreatedAt,
-				UpdatedAt: e.UpdatedAt,
-			}
-			c.JSON(http.StatusOK, dto)
-			return
-		}
+
+	dto := LegalEntityDTO{
+		UUID:      e.UUID,
+		Name:      e.Name,
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
 	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+	c.JSON(http.StatusOK, dto)
 }
 
 func (h *LegalEntityHandler) UpdateLegalEntity(c *gin.Context, uuid UUID) {
@@ -107,20 +107,28 @@ func (h *LegalEntityHandler) UpdateLegalEntity(c *gin.Context, uuid UUID) {
 	}
 
 	entity := &domain.LegalEntity{
-		UUID:      uuidToString(uuid),
-		Name:      input.Name,
-		UpdatedAt: time.Now(),
+		UUID: uuidToString(uuid),
+		Name: input.Name,
+		// CreatedAt не трогаем — прочтём после апдейта
+		// UpdatedAt выставит доменный сервис
 	}
 	if err := h.service.UpdateLegalEntity(c.Request.Context(), entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
+	// Читаем актуальную запись (с правильным CreatedAt/UpdatedAt)
+	updated, err := h.service.GetLegalEntity(c.Request.Context(), entity.UUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	dto := LegalEntityDTO{
-		UUID:      entity.UUID,
-		Name:      entity.Name,
-		CreatedAt: entity.CreatedAt,
-		UpdatedAt: entity.UpdatedAt,
+		UUID:      updated.UUID,
+		Name:      updated.Name,
+		CreatedAt: updated.CreatedAt,
+		UpdatedAt: updated.UpdatedAt,
 	}
 	c.JSON(http.StatusOK, dto)
 }
