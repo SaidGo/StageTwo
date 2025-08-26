@@ -1,11 +1,14 @@
+# перезаписать .gitignore чистой версией
+cat > .gitignore <<'EOF'
 # Go build artifacts
 /bin/
-/web.exe
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+/dist/
+/build/
+/coverage/
+/*.exe
+/*.dll
+/*.so
+/*.dylib
 *.test
 *.out
 
@@ -26,18 +29,17 @@
 .DS_Store
 Thumbs.db
 
-# Databases
+# Databases / local artifacts
 *.db
 *.sqlite
 *.sqlite3
 /legalentities.db
 
-# Migration binaries and embedded repos
+# Migration helper binaries / old embedded repos
 /migrate_bin/
-/migrate/
 migrate.exe
 
-# Environment / Config (local only)
+# Environment / local config
 *.environment.json
 crm.environment.json
 Study.study.json
@@ -56,28 +58,13 @@ Study.study.json
 *.coverprofile
 *.pprof
 
-<<<<<<< HEAD
-# Generated code
-wire_gen.go
-internal/web/**/api.gen.go
-internal/web/**/model_gen.go
-internal/web/**/server.gen.go
-
-# ignore embedded repos
-migrate/
-
-
-# ignore embedded repos
-migrate/
-
+# Project-specific misc
 web.exe
-legalentities.db
-migrate.exe
 migrations_pg_bak/
 migrations_sqlite/
 migrations_disabled/
 *.zip
-=======
+
 # OpenAPI generator temp
 openapi/.openapi
->>>>>>> bd0dddb (cleanup)
+EOF
