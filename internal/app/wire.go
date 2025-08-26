@@ -11,12 +11,14 @@ import (
 )
 
 var appSet = wire.NewSet(
+	NewDB,
 	NewApp,
 	NewRouter,
-	NewDB,
+
 	legalentities.NewRepository,
 	legalentities.NewService,
 	wire.Bind(new(legalentities.ServiceInterface), new(*legalentities.Service)),
+
 	olegalentity.NewLegalEntityHandler,
 	wire.Bind(new(olegalentity.ServerInterface), new(*olegalentity.LegalEntityHandler)),
 )

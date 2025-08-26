@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterRoutes регистрирует маршруты LegalEntityHandler в роутере Gin.
-func RegisterRoutes(router *gin.Engine, handler *LegalEntityHandler) {
-	RegisterHandlers(router, handler)
+// В oapi-codegen сгенерирована функция:
+//   func RegisterHandlers(router gin.IRouter, si ServerInterface)
+// Здесь вызов-обёртка под наш роутер.
+func RegisterLegalEntityRoutes(r *gin.Engine, si ServerInterface) {
+	RegisterHandlers(r, si)
 }

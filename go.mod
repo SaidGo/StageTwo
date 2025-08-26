@@ -24,7 +24,6 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/lib/pq v1.10.9
-	github.com/mattn/go-sqlite3 v1.14.29
 	github.com/minio/minio-go/v7 v7.0.53
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/prometheus/client_golang v1.17.0
@@ -80,6 +79,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.29 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect

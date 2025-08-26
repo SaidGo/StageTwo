@@ -1,58 +1,71 @@
 # Go2part
 
-## Описание
-Go2part — backend-сервис, реализующий многоуровневую архитектуру **Federation → Company → Legal Entity → Bank Account** с использованием Go, GORM, Gin, OpenAPI и миграций.
+Модульный backend-проект на Go с архитектурой DDD и поддержкой OpenAPI-генерации.
+
+## Стек
+
+- **Go 1.22+**
+- **Gin** (http-сервер)
+- **GORM** (ORM)
+- **Postgres** (основная база данных)
+- **golang-migrate** (миграции)
 
 ## Структура проекта
+
 ```
-cmd/               # CLI и Web точки входа
-domain/            # Доменные сущности
+cmd/               # точки входа (web, cli)
+domain/            # доменные модели
 dto/               # DTO для API
-internal/          # Логика по доменам
-  ├─ legalentities # CRUD Legal Entity
-  ├─ company       # Логика компаний
-  ├─ federation    # Логика федераций
-  ├─ web           # OpenAPI-хендлеры и middleware
+internal/          # бизнес-логика и сервисы
 migrations/        # SQL-миграции
-openapi/           # OpenAPI-описания
-pkg/               # Инфраструктурные пакеты (postgres, cache, redis и др.)
-scripts/           # Скрипты генерации и обслуживания
+openapi/           # OpenAPI-спецификация
+pkg/               # инфраструктурные пакеты
+scripts/           # bash-скрипты для сборки и тестов
 ```
 
-## Основные команды
+## Запуск
+
+### Требования
+
+- Go 1.22+
+- PostgreSQL 14+
+- make, bash
+
+### Команды
+
 ```bash
-# Сборка web-сервера
-go build ./cmd/web
+# Сборка
+make build
 
-# Сборка CLI
-go build ./cmd/cli
+# Запуск веб-сервера
+make run
 
-# Генерация OpenAPI
-make gen-openapi
+# Запуск миграций
+make migrate-up
 
-# Применение миграций (SQLite)
-make migrate-up-sqlite
+# Откат миграций
+make migrate-down
 
-# Применение миграций (PostgreSQL)
-make migrate-up-pg
+# Генерация OpenAPI-клиентов и серверов
+make gen
 
 # Очистка
 make clean
-
-# Генерация Wire
-make wire
 ```
 
-## Пример запуска (SQLite)
-```bash
-make build
-make migrate-up-sqlite
-./web
-```
+## Переменные окружения
 
-## Требования
-- Go >= 1.21
-- SQLite3 / PostgreSQL
-- make / bash-окружение (MSYS под Windows)
-- Wire
-- OpenAPI Generator
+- `POSTGRES_DSN` — строка подключения к PostgreSQL, например:
+  ```
+  postgres://postgres:password@localhost:5432/go2part?sslmode=disable
+  ```
+
+## API
+
+Документация API описана в `openapi/openapi.yaml`.
+
+Можно просмотреть через [Swagger Editor](https://editor.swagger.io/).
+
+---
+
+© Go2part Project

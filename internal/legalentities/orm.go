@@ -3,41 +3,38 @@ package legalentities
 import (
 	"time"
 
-	"example.com/local/Go2part/domain"
 	"gorm.io/gorm"
 )
 
-// ORM-модель.
-type LegalEntityORM struct {
-	UUID      string    `gorm:"type:uuid;primaryKey"`
-	Name      string    `gorm:"size:255;not null"`
-	CreatedAt time.Time `gorm:"not null"`
-	UpdatedAt time.Time `gorm:"not null"`
+// LegalEntity — ORM-модель таблицы legal_entities.
+// jsonb-колонка хранится как []byte (сырой JSON).
+type LegalEntity struct {
+	UUID             string         `gorm:"type:uuid;primaryKey;column:uuid"`
+	Name             string         `gorm:"type:text;not null;column:name"`
+	CompanyUUID      *string        `gorm:"type:uuid;column:company_uuid"`
+	BankAccountsJSON []byte         `gorm:"type:jsonb;not null;default:'[]'::jsonb;column:bank_accounts"`
+	CreatedAt        time.Time      `gorm:"not null;column:created_at"`
+	UpdatedAt        time.Time      `gorm:"not null;column:updated_at"`
+	DeletedAt        gorm.DeletedAt `gorm:"index;column:deleted_at"`
 }
 
-// ЯВНОЕ имя таблицы, чтобы не было расхождений.
-func (LegalEntityORM) TableName() string { return "legal_entity_orms" }
+func (LegalEntity) TableName() string { return "legal_entities" }
 
-// Маппинги домен <-> ORM.
-func (o *LegalEntityORM) ToDomain() *domain.LegalEntity {
-	return &domain.LegalEntity{
-		UUID:      o.UUID,
-		Name:      o.Name,
-		CreatedAt: o.CreatedAt,
-		UpdatedAt: o.UpdatedAt,
-	}
+// BankAccount — ORM-модель таблицы bank_accounts.
+type BankAccount struct {
+	UUID            string         `gorm:"type:uuid;primaryKey;default:gen_random_uuid();column:uuid"`
+	LegalEntityUUID string         `gorm:"type:uuid;not null;index;column:legal_entity_uuid"`
+	BIK             string         `gorm:"type:text;column:bik"`
+	Bank            string         `gorm:"type:text;column:bank"`
+	Address         string         `gorm:"type:text;column:address"`
+	CorrAccount     string         `gorm:"type:text;column:corr_account"`
+	Account         string         `gorm:"type:text;not null;column:account"`
+	Currency        string         `gorm:"type:text;column:currency"`
+	Comment         string         `gorm:"type:text;column:comment"`
+	IsPrimary       bool           `gorm:"type:boolean;not null;default:false;column:is_primary"`
+	CreatedAt       time.Time      `gorm:"not null;column:created_at"`
+	UpdatedAt       time.Time      `gorm:"not null;column:updated_at"`
+	DeletedAt       gorm.DeletedAt `gorm:"index;column:deleted_at"`
 }
 
-func LegalEntityFromDomain(d *domain.LegalEntity) *LegalEntityORM {
-	return &LegalEntityORM{
-		UUID:      d.UUID,
-		Name:      d.Name,
-		CreatedAt: d.CreatedAt,
-		UpdatedAt: d.UpdatedAt,
-	}
-}
-
-// Автомиграция таблицы.
-func AutoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&LegalEntityORM{})
-}
+func (BankAccount) TableName() string { return "bank_accounts" }

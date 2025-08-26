@@ -1,27 +1,36 @@
-.PHONY: build run test tidy wire migrate-up
 
-BIN_DIR := bin
+APP_NAME=web
+BINARY=bin/$(APP_NAME)
+PKG=example.com/local/Go2part
 
+.PHONY: all build run clean wire migrate fmt lint
+
+all: build
+
+## Build application
 build:
-	go build -o $(BIN_DIR)/web cmd/web/main.go
+	go build -o $(BINARY) ./cmd/web
 
+## Run application
 run:
-	go run cmd/web/main.go
+	go run ./cmd/web
 
-test:
-	go test -v ./...
-
-tidy:
-	go mod tidy
-
+## Wire dependency injection
 wire:
-	wire ./internal/app
+	cd internal/app && wire
 
-# Требуется экспортировать POSTGRES_DSN с паролем:
-#   export POSTGRES_DSN='postgres://postgres:Salavdi1@127.0.0.1:5432/go2part?sslmode=disable'
-migrate-up:
-	@if [ -z "$$POSTGRES_DSN" ]; then \
-	  echo "Нужно экспортировать POSTGRES_DSN с паролем (postgres://user:pass@host:port/db?sslmode=disable)"; \
-	  exit 1; \
-	fi
-	./migrate_bin/migrate.exe -path "./migrations" -database "$(POSTGRES_DSN)" up
+## Run migrations (Postgres DSN must be set in POSTGRES_DSN)
+migrate:
+	migrate -path migrations -database "$$POSTGRES_DSN" up
+
+## Format code
+fmt:
+	gofmt -s -w .
+
+## Lint (staticcheck required)
+lint:
+	staticcheck ./...
+
+## Clean build artifacts
+clean:
+	rm -rf bin/ web.exe *.out *.test

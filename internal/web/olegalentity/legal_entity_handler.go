@@ -173,3 +173,128 @@ type LegalEntityDTO struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+// ===== BankAccount handlers =====
+
+// GET /legal-entities/:uuid/bank-accounts
+func (h *LegalEntityHandler) GetAllBankAccounts(c *gin.Context) {
+	leStr := c.Param("uuid")
+	items, err := h.service.ListBankAccounts(c.Request.Context(), leStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"accounts": items})
+}
+
+// POST /legal-entities/:uuid/bank-accounts
+func (h *LegalEntityHandler) CreateBankAccount(c *gin.Context) {
+	leStr := c.Param("uuid")
+
+	var in struct {
+		BIK         string `json:"bik"`
+		Bank        string `json:"bank"`
+		Address     string `json:"address"`
+		CorrAccount string `json:"corr_account"`
+		Account     string `json:"account" binding:"required"`
+		Currency    string `json:"currency"`
+		Comment     string `json:"comment"`
+		IsPrimary   bool   `json:"is_primary"`
+	}
+	if err := c.ShouldBindJSON(&in); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	e := &domain.BankAccount{
+		BIK:         in.BIK,
+		Bank:        in.Bank,
+		Address:     in.Address,
+		CorrAccount: in.CorrAccount,
+		Account:     in.Account,
+		Currency:    in.Currency,
+		Comment:     in.Comment,
+		IsPrimary:   in.IsPrimary,
+	}
+
+	if err := h.service.CreateBankAccount(c.Request.Context(), leStr, e); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"uuid":              e.UUID,
+		"legal_entity_uuid": e.LegalEntityUUID,
+		"bik":               e.BIK,
+		"bank":              e.Bank,
+		"address":           e.Address,
+		"corr_account":      e.CorrAccount,
+		"account":           e.Account,
+		"currency":          e.Currency,
+		"comment":           e.Comment,
+		"is_primary":        e.IsPrimary,
+		"created_at":        e.CreatedAt,
+		"updated_at":        e.UpdatedAt,
+		"deleted_at":        e.DeletedAt,
+	})
+}
+
+// PUT /legal-entities/:uuid/bank-accounts/:accountId
+func (h *LegalEntityHandler) UpdateBankAccount(c *gin.Context) {
+	leStr := c.Param("uuid")
+	baStr := c.Param("accountId")
+	if baStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "accountId is required"})
+		return
+	}
+	var in struct {
+		BIK         string `json:"bik"`
+		Bank        string `json:"bank"`
+		Address     string `json:"address"`
+		CorrAccount string `json:"corr_account"`
+		Account     string `json:"account"`
+		Currency    string `json:"currency"`
+		Comment     string `json:"comment"`
+		IsPrimary   bool   `json:"is_primary"`
+	}
+	if err := c.ShouldBindJSON(&in); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	e := &domain.BankAccount{
+		UUID:        baStr,
+		BIK:         in.BIK,
+		Bank:        in.Bank,
+		Address:     in.Address,
+		CorrAccount: in.CorrAccount,
+		Account:     in.Account,
+		Currency:    in.Currency,
+		Comment:     in.Comment,
+		IsPrimary:   in.IsPrimary,
+	}
+	if err := h.service.UpdateBankAccount(c.Request.Context(), leStr, e); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "updated"})
+}
+
+// DELETE /legal-entities/:uuid/bank-accounts/:accountId
+func (h *LegalEntityHandler) DeleteBankAccount(c *gin.Context) {
+	leStr := c.Param("uuid")
+	baStr := c.Param("accountId")
+	if baStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "accountId is required"})
+		return
+	}
+	if err := h.service.DeleteBankAccount(c.Request.Context(), leStr, baStr); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+func NewLegalEntityHandlerFromApp(a interface{}) *LegalEntityHandler {
+
+	panic("Нужно больше данных: укажите поле сервиса в *app.App")
+}
