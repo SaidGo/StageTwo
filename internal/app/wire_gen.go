@@ -9,15 +9,16 @@ import (
 	"example.com/local/Go2part/internal/web"
 )
 
-// InitApp инициализирует зависимости приложения без google/wire.
-// Порядок:
-//
-//	NewDB -> legalentities.NewRepository -> legalentities.NewService ->
-//	web.NewRouter(service) -> NewApp(router, service)
+// InitApp — ручная инициализация зависимостей без google/wire.
 func InitApp() (*App, error) {
 	db, err := NewDB()
 	if err != nil {
 		return nil, fmt.Errorf("NewDB: %w", err)
+	}
+
+	// ВАЖНО: фиксация схемы BA (снятие NOT NULL/FK и DEFAULT для uuid)
+	if err := applyBankAccountsFix(db); err != nil {
+		return nil, fmt.Errorf("applyBankAccountsFix: %w", err)
 	}
 
 	repo := legalentities.NewRepository(db)

@@ -1,112 +1,66 @@
 package legalentities
 
 import (
-	"example.com/local/Go2part/domain"
-)
-
-import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 
+	"example.com/local/Go2part/domain"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
-// Repository интерфейс
 type Repository interface {
-	// LegalEntity (2.1)
-	Create(ctx context.Context, le *domain.LegalEntity) error
-	GetAll(ctx context.Context) ([]*domain.LegalEntity, error)
-	GetByID(ctx context.Context, id string) (*domain.LegalEntity, error)
-	Update(ctx context.Context, le *domain.LegalEntity) error
-	Delete(ctx context.Context, id string) error
-
-	// BankAccount (2.2)
-	GetAllBankAccounts(ctx context.Context, legalEntityUUID string) ([]*domain.BankAccount, error)
-	CreateBankAccount(ctx context.Context, acc *domain.BankAccount) error
-	UpdateBankAccount(ctx context.Context, acc *domain.BankAccount) error
-	DeleteBankAccount(ctx context.Context, legalEntityUUID string, accountUUID string) error
+	CreateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error)
+	ListAllBankAccounts(ctx context.Context) ([]domain.BankAccount, error)
+	GetBankAccount(ctx context.Context, id string) (domain.BankAccount, error)
+	UpdateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error)
+	DeleteBankAccount(ctx context.Context, id string) error
 	ListBankAccounts(ctx context.Context, leUUID string) ([]domain.BankAccount, error)
 }
 
-type repository struct {
-	db *gorm.DB
-}
+type repository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) Repository { return &repository{db: db} }
 
-// ==========================
-// ========== MAPPERS =======
-// ==========================
+// mapping
 
-func ormLEToDomain(o *LegalEntity) (*domain.LegalEntity, error) {
-	var accs []domain.BankAccount
-	if len(o.BankAccountsJSON) > 0 {
-		if err := json.Unmarshal(o.BankAccountsJSON, &accs); err != nil {
-			return nil, err
-		}
+func mapRowToDomain(r bankAccountRow) domain.BankAccount {
+	var le uuid.UUID
+	if r.LegalEntityUUID != nil {
+		le = *r.LegalEntityUUID
 	}
-	d := &domain.LegalEntity{
-		UUID:         o.UUID,
-		Name:         o.Name,
-		CreatedAt:    o.CreatedAt,
-		UpdatedAt:    o.UpdatedAt,
-		BankAccounts: accs,
+	var deletedAt *time.Time
+	if r.DeletedAt.Valid {
+		t := r.DeletedAt.Time
+		deletedAt = &t
 	}
-	if o.CompanyUUID != nil {
-		d.CompanyUUID = *o.CompanyUUID
-	}
-	return d, nil
-}
-
-func domainLEToOrm(d *domain.LegalEntity) (*LegalEntity, error) {
-	baJSON := []byte("[]")
-	if len(d.BankAccounts) > 0 {
-		b, err := json.Marshal(d.BankAccounts)
-		if err != nil {
-			return nil, err
-		}
-		baJSON = b
-	}
-	var companyPtr *string
-	if d.CompanyUUID != "" {
-		v := d.CompanyUUID
-		companyPtr = &v
-	}
-	return &LegalEntity{
-		UUID:             d.UUID,
-		Name:             d.Name,
-		CompanyUUID:      companyPtr,
-		BankAccountsJSON: baJSON,
-		CreatedAt:        d.CreatedAt,
-		UpdatedAt:        d.UpdatedAt,
-	}, nil
-}
-
-func ormBAtoDomain(o *BankAccount) *domain.BankAccount {
-	return &domain.BankAccount{
-		UUID:            o.UUID,
-		LegalEntityUUID: o.LegalEntityUUID,
-		BIK:             o.BIK,
-		Bank:            o.Bank,
-		Address:         o.Address,
-		CorrAccount:     o.CorrAccount,
-		Account:         o.Account,
-		Currency:        o.Currency,
-		Comment:         o.Comment,
-		IsPrimary:       o.IsPrimary,
-		CreatedAt:       o.CreatedAt,
-		UpdatedAt:       o.UpdatedAt,
-		// DeletedAt пропускаем наружу как *time.Time по желанию
+	return domain.BankAccount{
+		UUID:            r.UUID,
+		LegalEntityUUID: le,
+		BIK:             r.BIK,
+		Bank:            r.Bank,
+		Address:         r.Address,
+		CorrAccount:     r.CorrAccount,
+		Account:         r.Account,
+		Currency:        r.Currency,
+		Comment:         r.Comment,
+		IsPrimary:       r.IsPrimary,
+		CreatedAt:       r.CreatedAt,
+		UpdatedAt:       r.UpdatedAt,
+		DeletedAt:       deletedAt,
 	}
 }
 
-func domainBAtoOrm(d *domain.BankAccount) *BankAccount {
-	return &BankAccount{
+func mapDomainToRow(d *domain.BankAccount) bankAccountRow {
+	var le *uuid.UUID
+	if d.LegalEntityUUID != uuid.Nil {
+		tmp := d.LegalEntityUUID
+		le = &tmp
+	}
+	return bankAccountRow{
 		UUID:            d.UUID,
-		LegalEntityUUID: d.LegalEntityUUID,
+		LegalEntityUUID: le,
 		BIK:             d.BIK,
 		Bank:            d.Bank,
 		Address:         d.Address,
@@ -115,256 +69,107 @@ func domainBAtoOrm(d *domain.BankAccount) *BankAccount {
 		Currency:        d.Currency,
 		Comment:         d.Comment,
 		IsPrimary:       d.IsPrimary,
-		CreatedAt:       d.CreatedAt,
-		UpdatedAt:       d.UpdatedAt,
 	}
 }
 
-// ==========================
-// ====== LegalEntity =======
-// ==========================
+// CRUD
 
-func (r *repository) Create(ctx context.Context, le *domain.LegalEntity) error {
-	now := time.Now().UTC()
-	if le.CreatedAt.IsZero() {
-		le.CreatedAt = now
+func (r *repository) CreateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error) {
+	row := mapDomainToRow(ba)
+	if row.UUID == uuid.Nil {
+		row.UUID = uuid.New()
 	}
-	if le.UpdatedAt.IsZero() {
-		le.UpdatedAt = now
+	if err := r.db.WithContext(ctx).Create(&row).Error; err != nil {
+		return domain.BankAccount{}, err
 	}
-	orm, err := domainLEToOrm(le)
+	var saved bankAccountRow
+	if err := r.db.WithContext(ctx).Where("uuid = ?", row.UUID).First(&saved).Error; err != nil {
+		return domain.BankAccount{}, err
+	}
+	return mapRowToDomain(saved), nil
+}
+
+func (r *repository) ListAllBankAccounts(ctx context.Context) ([]domain.BankAccount, error) {
+	var rows []bankAccountRow
+	if err := r.db.WithContext(ctx).Where("deleted_at IS NULL").Order("is_primary DESC, created_at ASC").Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	out := make([]domain.BankAccount, 0, len(rows))
+	for _, rr := range rows {
+		out = append(out, mapRowToDomain(rr))
+	}
+	return out, nil
+}
+
+func (r *repository) GetBankAccount(ctx context.Context, id string) (domain.BankAccount, error) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return domain.BankAccount{}, err
+	}
+	var row bankAccountRow
+	if err := r.db.WithContext(ctx).Where("uuid = ? AND deleted_at IS NULL", uid).First(&row).Error; err != nil {
+		return domain.BankAccount{}, err
+	}
+	return mapRowToDomain(row), nil
+}
+
+func (r *repository) UpdateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error) {
+	var existing bankAccountRow
+	if err := r.db.WithContext(ctx).Where("uuid = ? AND deleted_at IS NULL", ba.UUID).First(&existing).Error; err != nil {
+		return domain.BankAccount{}, err
+	}
+	var le *uuid.UUID
+	if ba.LegalEntityUUID != uuid.Nil {
+		tmp := ba.LegalEntityUUID
+		le = &tmp
+	}
+	updates := map[string]any{
+		"legal_entity_uuid": le,
+		"bik":               ba.BIK,
+		"bank":              ba.Bank,
+		"address":           ba.Address,
+		"corr_account":      ba.CorrAccount,
+		"account":           ba.Account,
+		"currency":          ba.Currency,
+		"comment":           ba.Comment,
+		"is_primary":        ba.IsPrimary,
+	}
+	if err := r.db.WithContext(ctx).Model(&bankAccountRow{}).Where("uuid = ? AND deleted_at IS NULL", ba.UUID).Updates(updates).Error; err != nil {
+		return domain.BankAccount{}, err
+	}
+	if err := r.db.WithContext(ctx).Where("uuid = ?", ba.UUID).First(&existing).Error; err != nil {
+		return domain.BankAccount{}, err
+	}
+	return mapRowToDomain(existing), nil
+}
+
+func (r *repository) DeleteBankAccount(ctx context.Context, id string) error {
+	uid, err := uuid.Parse(id)
 	if err != nil {
 		return err
 	}
-	if err := r.db.WithContext(ctx).Create(orm).Error; err != nil {
-		return err
+	res := r.db.WithContext(ctx).Where("uuid = ? AND deleted_at IS NULL", uid).Delete(&bankAccountRow{})
+	if res.Error != nil {
+		return res.Error
 	}
-	le.CreatedAt = orm.CreatedAt
-	le.UpdatedAt = orm.UpdatedAt
+	if res.RowsAffected == 0 {
+		return errors.New("not found")
+	}
 	return nil
 }
 
-func (r *repository) GetAll(ctx context.Context) ([]*domain.LegalEntity, error) {
-	var list []LegalEntity
-	if err := r.db.WithContext(ctx).
-		Where("deleted_at IS NULL").
-		Find(&list).Error; err != nil {
-		return nil, err
-	}
-	out := make([]*domain.LegalEntity, 0, len(list))
-	for i := range list {
-		d, err := ormLEToDomain(&list[i])
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, d)
-	}
-	return out, nil
-}
-
-func (r *repository) GetByID(ctx context.Context, id string) (*domain.LegalEntity, error) {
-	var o LegalEntity
-	if err := r.db.WithContext(ctx).
-		Where("uuid = ? AND deleted_at IS NULL", id).
-		First(&o).Error; err != nil {
-		return nil, err
-	}
-	return ormLEToDomain(&o)
-}
-
-func (r *repository) Update(ctx context.Context, le *domain.LegalEntity) error {
-	baJSON := []byte("[]")
-	if len(le.BankAccounts) > 0 {
-		b, err := json.Marshal(le.BankAccounts)
-		if err != nil {
-			return err
-		}
-		baJSON = b
-	}
-	updates := map[string]any{
-		"name":          le.Name,
-		"bank_accounts": baJSON,
-		"updated_at":    gorm.Expr("NOW()"),
-	}
-	// company_uuid nullable
-	if le.CompanyUUID == "" {
-		updates["company_uuid"] = gorm.Expr("NULL")
-	} else {
-		updates["company_uuid"] = le.CompanyUUID
-	}
-	return r.db.WithContext(ctx).
-		Model(&LegalEntity{}).
-		Where("uuid = ? AND deleted_at IS NULL", le.UUID).
-		Updates(updates).Error
-}
-
-func (r *repository) Delete(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).
-		Model(&LegalEntity{}).
-		Where("uuid = ? AND deleted_at IS NULL", id).
-		Update("deleted_at", gorm.Expr("NOW()")).Error
-}
-
-// ==========================
-// ===== Bank Accounts ======
-// ==========================
-
-func (r *repository) GetAllBankAccounts(ctx context.Context, legalEntityUUID string) ([]*domain.BankAccount, error) {
-	var rows []BankAccount
-	if err := r.db.WithContext(ctx).
-		Where("legal_entity_uuid = ?", legalEntityUUID).
-		Order("is_primary DESC, created_at ASC").
-		Find(&rows).Error; err != nil {
-		return nil, err
-	}
-	out := make([]*domain.BankAccount, 0, len(rows))
-	for i := range rows {
-		out = append(out, ormBAtoDomain(&rows[i]))
-	}
-	return out, nil
-}
-
-func (r *repository) CreateBankAccount(ctx context.Context, acc *domain.BankAccount) error {
-	orm := domainBAtoOrm(acc)
-	// защищаем инвариант: у аккаунта должен быть валидный владелец
-	if orm.LegalEntityUUID == "" {
-		return errors.New("legal_entity_uuid is empty")
-	}
-	// если is_primary=true — делаем его единственным primary у LE
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if orm.IsPrimary {
-			if err := tx.Model(&BankAccount{}).
-				Where("legal_entity_uuid = ?", orm.LegalEntityUUID).
-				Update("is_primary", false).Error; err != nil {
-				return err
-			}
-		}
-		return tx.Create(orm).Error
-	})
-}
-
-func (r *repository) UpdateBankAccount(ctx context.Context, acc *domain.BankAccount) error {
-	if acc.UUID == "" {
-		return errors.New("bank_account uuid is empty")
-	}
-	orm := domainBAtoOrm(acc)
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// is_primary: если включаем — выключаем остальные
-		if orm.IsPrimary {
-			if err := tx.Model(&BankAccount{}).
-				Where("legal_entity_uuid = ? AND uuid <> ?", orm.LegalEntityUUID, orm.UUID).
-				Update("is_primary", false).Error; err != nil {
-				return err
-			}
-		}
-		return tx.Model(&BankAccount{}).
-			Where("uuid = ? AND legal_entity_uuid = ? AND deleted_at IS NULL", orm.UUID, orm.LegalEntityUUID).
-			Updates(map[string]any{
-				"bik":          orm.BIK,
-				"bank":         orm.Bank,
-				"address":      orm.Address,
-				"corr_account": orm.CorrAccount,
-				"account":      orm.Account,
-				"currency":     orm.Currency,
-				"comment":      orm.Comment,
-				"is_primary":   orm.IsPrimary,
-				"updated_at":   gorm.Expr("NOW()"),
-			}).Error
-	})
-}
-
-func (r *repository) DeleteBankAccount(ctx context.Context, legalEntityUUID string, accountUUID string) error {
-	return r.db.WithContext(ctx).
-		Model(&BankAccount{}).
-		Where("uuid = ? AND legal_entity_uuid = ? AND deleted_at IS NULL", accountUUID, legalEntityUUID).
-		Update("deleted_at", gorm.Expr("NOW()")).Error
-}
-
-// ==============
-// = Индексы ====
-// ==============
-
-// EnsureIndexes — необязательная защита от отсутствующих индексов, выполнить один раз при старте (idempotent).
-func (r *repository) EnsureIndexes(ctx context.Context) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Exec(`CREATE INDEX IF NOT EXISTS idx_bank_accounts_legal_entity_uuid ON bank_accounts(legal_entity_uuid)`).Error; err != nil {
-			return err
-		}
-		if err := tx.Exec(`CREATE INDEX IF NOT EXISTS idx_bank_accounts_deleted_at ON bank_accounts(deleted_at)`).Error; err != nil {
-			return err
-		}
-		// На legal_entities.bank_accounts (jsonb) индекс опциональный, если нужен поиск по json.
-		return nil
-	})
-}
-
-// ==============
-// = Preload ====
-// ==============
-
-// GetWithAccounts — утилита при необходимости получать LE вместе с аккаунтами (JOIN + Preload)
-func (r *repository) GetWithAccounts(ctx context.Context, id string) (*domain.LegalEntity, error) {
-	var o LegalEntity
-	if err := r.db.WithContext(ctx).
-		Preload(clause.Associations).
-		Where("uuid = ? AND deleted_at IS NULL", id).
-		First(&o).Error; err != nil {
-		return nil, err
-	}
-	return ormLEToDomain(&o)
-}
-
-// ListBankAccounts возвращает все живые (не удалённые) счета юрлица из таблицы bank_accounts.
 func (r *repository) ListBankAccounts(ctx context.Context, leUUID string) ([]domain.BankAccount, error) {
-	var rows []bankAccountRow
-	if err := r.db.WithContext(ctx).
-		Where("legal_entity_uuid = ?", leUUID).
-		Order("is_primary DESC, created_at ASC").
-		Find(&rows).Error; err != nil {
+	le, err := uuid.Parse(leUUID)
+	if err != nil {
 		return nil, err
 	}
-
+	var rows []bankAccountRow
+	if err := r.db.WithContext(ctx).Where("legal_entity_uuid = ? AND deleted_at IS NULL", le).Order("is_primary DESC, created_at ASC").Find(&rows).Error; err != nil {
+		return nil, err
+	}
 	out := make([]domain.BankAccount, 0, len(rows))
-	for _, o := range rows {
-		out = append(out, domain.BankAccount{
-			UUID:            o.UUID,
-			LegalEntityUUID: o.LegalEntityUUID,
-			BIK:             o.BIK,
-			Bank:            o.Bank,
-			Address:         o.Address,
-			CorrAccount:     o.CorrAccount,
-			Account:         o.Account,
-			Currency:        o.Currency,
-			Comment:         o.Comment,
-			IsPrimary:       o.IsPrimary,
-			CreatedAt:       o.CreatedAt,
-			UpdatedAt:       o.UpdatedAt,
-			DeletedAt: func(d gorm.DeletedAt) *time.Time {
-				if d.Valid {
-					return &d.Time
-				}
-				return nil
-			}(o.DeletedAt),
-		})
+	for _, rr := range rows {
+		out = append(out, mapRowToDomain(rr))
 	}
 	return out, nil
 }
-
-// bankAccountRow — локальная ORM-модель таблицы bank_accounts
-type bankAccountRow struct {
-	UUID            string `gorm:"type:uuid;primaryKey"`
-	LegalEntityUUID string `gorm:"type:uuid;not null;index"`
-	BIK             string
-	Bank            string
-	Address         string
-	CorrAccount     string
-	Account         string `gorm:"not null"`
-	Currency        string
-	Comment         string
-	IsPrimary       bool           `gorm:"not null;default:false"`
-	CreatedAt       time.Time      `gorm:"not null"`
-	UpdatedAt       time.Time      `gorm:"not null"`
-	DeletedAt       gorm.DeletedAt `gorm:"index"`
-}
-
-func (bankAccountRow) TableName() string { return "bank_accounts" }

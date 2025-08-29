@@ -1,0 +1,4 @@
+	// (GET /legal-entities)
+	// (POST /legal-entities)
+	GetLegalEntities(c *gin.Context, params GetLegalEntitiesParams)
+	PostLegalEntities(c *gin.Context)

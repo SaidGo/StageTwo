@@ -68,3 +68,7 @@ migrations_disabled/
 # OpenAPI generator temp
 openapi/.openapi
 EOF
+# backups / temps
+*.bak
+*.bak_old
+*.tmp

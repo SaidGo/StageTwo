@@ -158,3 +158,85 @@ components:
         type: integer
         minimum: 0
         default: 0
+  /bank_accounts:
+    get:
+      summary: List all bank accounts
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create bank account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankAccountCreate'
+      responses:
+        '201':
+          description: Created
+
+  /bank_accounts/{uuid}:
+    get:
+      summary: Get bank account by UUID
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+        '404': { description: Not found }
+    put:
+      summary: Update bank account by UUID
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BankAccountUpdate' }
+      responses:
+        '200': { description: Updated }
+    delete:
+      summary: Delete bank account by UUID
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: No Content }
+
+  /legal_entities/{uuid}/bank_accounts:
+    get:
+      summary: List bank accounts for specific Legal Entity
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+
+components:
+  schemas:
+    BankAccountCreate:
+      type: object
+      properties:
+        legal_entity_uuid: { type: string, format: uuid, nullable: true }
+        bik:              { type: string }
+        bank:             { type: string }
+        address:          { type: string }
+        corr_account:     { type: string }
+        account:          { type: string }
+        currency:         { type: string }
+        comment:          { type: string }
+        is_primary:       { type: boolean }
+      required: [bik, bank, account, currency]
+    BankAccountUpdate:
+      allOf:
+        - $ref: '#/components/schemas/BankAccountCreate'

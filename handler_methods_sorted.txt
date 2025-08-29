@@ -1,0 +1,9 @@
+CreateBankAccount(c *gin.Context, uuid UUID) {
+DeleteBankAccount(c *gin.Context, uuid UUID, accountId UUID) {
+DeleteLegalEntitiesUuid(c *gin.Context, uuid UUID) {
+GetAllBankAccounts(c *gin.Context, uuid UUID) {
+GetLegalEntities(c *gin.Context, params olegalentity.GetLegalEntitiesParams) {
+GetLegalEntitiesUuid(c *gin.Context, uuid UUID) {
+PostLegalEntities(c *gin.Context) {
+PutLegalEntitiesUuid(c *gin.Context, uuid UUID) {
+UpdateBankAccount(c *gin.Context, uuid UUID, accountId UUID) {

@@ -21,7 +21,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/iancoleman/strcase v0.3.0
-	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/lib/pq v1.10.9
 	github.com/minio/minio-go/v7 v7.0.53
@@ -34,7 +33,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17
-	golang.org/x/sync v0.16.0
 	gorm.io/datatypes v1.2.0
 	gorm.io/driver/postgres v1.5.0
 	gorm.io/driver/sqlite v1.5.7
@@ -105,6 +103,7 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
