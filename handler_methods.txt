@@ -1,9 +1,0 @@
-GetLegalEntities(c *gin.Context, params olegalentity.GetLegalEntitiesParams) {
-PostLegalEntities(c *gin.Context) {
-GetLegalEntitiesUuid(c *gin.Context, uuid UUID) {
-PutLegalEntitiesUuid(c *gin.Context, uuid UUID) {
-DeleteLegalEntitiesUuid(c *gin.Context, uuid UUID) {
-GetAllBankAccounts(c *gin.Context, uuid UUID) {
-CreateBankAccount(c *gin.Context, uuid UUID) {
-UpdateBankAccount(c *gin.Context, uuid UUID, accountId UUID) {
-DeleteBankAccount(c *gin.Context, uuid UUID, accountId UUID) {

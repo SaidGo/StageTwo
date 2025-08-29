@@ -66,3 +66,8 @@ migrations_disabled/
 
 # OpenAPI generator temp
 openapi/.openapi
+
+# dev/tmp files
+handler_methods*.txt
+interface_methods*.txt
+
