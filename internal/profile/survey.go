@@ -21,7 +21,6 @@ func (s *Service) GetSurvey(uid uuid.UUID) (domain.Survey, error) {
 		return domain.Survey{}, err
 	}
 
-	// @todo: refactor
 	user, f := s.dict.FindUserByUUID(orm.UserUUID)
 	dmUser := domain.User{}
 	if !f {

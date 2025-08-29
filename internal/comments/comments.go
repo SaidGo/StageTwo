@@ -35,7 +35,6 @@ func (s *Service) GetTaskComments(uid uuid.UUID, withFiles, withLikes bool) (dms
 		return dms, err
 	}
 
-	// People
 	for i, dm := range dms {
 		emails := lo.Keys(dm.People)
 
@@ -55,7 +54,6 @@ func (s *Service) GetTaskComments(uid uuid.UUID, withFiles, withLikes bool) (dms
 		})
 	}
 
-	// Files
 	if withFiles {
 		for i, dm := range dms {
 			files, err := s.storage.GetCommentFiles(dm.UUID, true)
@@ -67,7 +65,6 @@ func (s *Service) GetTaskComments(uid uuid.UUID, withFiles, withLikes bool) (dms
 		}
 	}
 
-	// Likes
 	if withLikes {
 		for i, dm := range dms {
 			emails := lo.Keys(dm.Likes)

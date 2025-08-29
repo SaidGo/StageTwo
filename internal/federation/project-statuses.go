@@ -107,7 +107,6 @@ func (s *Service) GetProjectStatuses(projectUUID uuid.UUID) (tags []domain.Proje
 
 	lo.Reverse(pr.StatusSort)
 
-	// Sort and mv Unknown status to the first position
 	pr.StatusSort = lo.Filter(pr.StatusSort, func(n int, _ int) bool {
 		return n != domain.StatusUnknown
 	})

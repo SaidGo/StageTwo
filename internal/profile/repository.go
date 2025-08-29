@@ -38,7 +38,6 @@ func NewRepository(db *postgres.GDB, rds *redis.RDS, metrics *helpers.MetricsCou
 	return &Repository{
 		gorm: db,
 		rds:  rds,
-		// events: events,
 
 		counter: metrics.RepoCounter,
 	}
@@ -245,7 +244,6 @@ func (r *Repository) StoreValidationSimple(email string) (string, error) {
 
 	key := fmt.Sprintf("validation:simple:%s:%s", email, code)
 
-	// @todo: mv to one transaction
 	err := r.rds.HSET(context.Background(), key, "code", code)
 	if err != nil {
 		return "", err
@@ -415,7 +413,7 @@ func (r *Repository) ChangeFieldTx(tx *gorm.DB, uid uuid.UUID, fieldName string,
 }
 
 func (r *Repository) DeleteUser(uid uuid.UUID) error {
-	// todo: mv user to deleted table
+
 	err := r.gorm.DB.
 		Where("uuid = ?", uid).
 		Delete(&User{}).
@@ -464,9 +462,8 @@ func (r *Repository) AcceptInvite(uid uuid.UUID) (err error) {
 		return dto.NotFoundErrf("[email:%v] пользователь не найден", orm.Email)
 	}
 
-	// Add user to company
 	if orm.CompanyUUID != nil {
-		// Add user to federation
+
 		err = r.AddUser(user.UUID, orm.FederationUUID)
 		if err != nil {
 			return err
@@ -484,7 +481,7 @@ func (r *Repository) AcceptInvite(uid uuid.UUID) (err error) {
 			return err
 		}
 	} else {
-		// Add user to federation
+
 		err = r.AddUser(user.UUID, orm.FederationUUID)
 		if err != nil {
 			return err

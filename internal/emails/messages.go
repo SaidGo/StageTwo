@@ -25,12 +25,8 @@ func (m Message) GetBody() string {
 	return m.body
 }
 
-// Confirmation email template
-//
-//go:embed confirmation.html
 var confirmationTmpl string
 
-//go:embed reset.html
 var resetTmpl string
 
 func NewConfirmationMessage(code string) (IMessage, error) {

@@ -126,7 +126,6 @@ func (j *JSONArray) Scan(value interface{}) error {
 
 type IntArray []int
 
-// Scan scan value into Jsonb, implements sql.Scanner interface.
 func (j *IntArray) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -139,14 +138,12 @@ func (j *IntArray) Scan(value interface{}) error {
 	return err
 }
 
-// Value return json value, implement driver.Valuer interface.
 func (j IntArray) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
 
 type StringArray []string
 
-// Scan scan value into Jsonb, implements sql.Scanner interface.
 func (j *StringArray) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -159,12 +156,10 @@ func (j *StringArray) Scan(value interface{}) error {
 	return err
 }
 
-// Value return json value, implement driver.Valuer interface.
 func (j StringArray) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
 
-//nolint:revive //it is orm table name
 type FederationUser struct {
 	UUID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();not null:false;primary_key:true"`
 	FederationUUID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_member"`

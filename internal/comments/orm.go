@@ -28,15 +28,12 @@ type Comment struct {
 	Pin bool `gorm:"type:boolean;default:false;not null;"`
 }
 
-// JSONB Interface for JSONB Field of yourTableName Table.
 type Persons map[string]int64
 
-// Value Marshal.
 func (a Persons) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
 
-// Scan Unmarshal.
 func (a *Persons) Scan(value interface{}) error {
 	b, ok := value.([]byte)
 	if !ok {

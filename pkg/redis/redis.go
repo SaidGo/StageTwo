@@ -18,9 +18,9 @@ type RDS struct {
 type Creds string
 
 func New(creds Creds) (*RDS, error) {
-	// parse string: redis://$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable
+	
 
-	pattern := regexp.MustCompile(`redis://(?P<password>[^@]+)@(?P<host>[^:]+):(?P<port>[^/]+)/(?P<dbname>[^?]+)`)
+	pattern := regexp.MustCompile(`redis:
 	sub := pattern.FindStringSubmatch(string(creds))
 
 	if len(sub) != 5 {
@@ -49,7 +49,7 @@ func New(creds Creds) (*RDS, error) {
 	return &RDS{rdb: rdb}, nil
 }
 
-// Fetch str from redis.
+
 func (rds *RDS) GetStr(ctx context.Context, key string) (string, error) {
 	v, err := rds.rdb.Get(ctx, key).Result()
 
@@ -62,7 +62,7 @@ func (rds *RDS) GetStr(ctx context.Context, key string) (string, error) {
 	return v, nil
 }
 
-// ttl - in seconds.
+
 func (rds *RDS) SetStr(ctx context.Context, key, value string, ttl int) error {
 	err := rds.rdb.Set(ctx, key, value, time.Duration(ttl)*time.Second).Err()
 

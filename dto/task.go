@@ -79,7 +79,6 @@ type TaskDTO struct {
 	ChildrensTotal int         `json:"childrens_total"`
 	ChildrensUUID  []uuid.UUID `json:"childrens_uuid"`
 
-	// @todo: renaim
 	LinkedFieldsData map[uuid.UUID]interface{} `json:"linked_fields_data"`
 
 	Stops []domain.Stop `json:"stops"`
@@ -155,7 +154,6 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 	coWorkers, _ := dict.FindUsers(dm.CoWorkersBy)
 	watchBy, _ := dict.FindUsers(dm.WatchBy)
 
-	// todo: add company to task dto and table
 	project, f := dict.FindProject(dm.ProjectUUID)
 	if !f {
 		logrus.Errorf("project not found: %s", dm.ProjectUUID)
@@ -179,13 +177,11 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 		}
 	}
 
-	// comments
 	commentsDtos := []CommentDTO{}
 	for _, dm := range comments {
 		commentsDtos = append(commentsDtos, NewCommentDTO(dm, dict, s3))
 	}
 
-	// comments
 	remindersDtos := lo.Map(reminders, func(dm domain.Reminder, index int) ReminderDTO {
 		return ReminderDTO{
 			UUID:        dm.UUID,
@@ -200,7 +196,6 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 		}
 	})
 
-	// first open
 	firstOpen := []OpenByDTO{}
 
 	if len(dm.FirstOpen) > 0 {
@@ -223,7 +218,6 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 		}
 	}
 
-	// files
 	filesDtos := lo.Map(files, func(dm domain.File, index int) FileDTOs {
 		createdBy, f := dict.FindUserByUUID(dm.CreatedBy)
 		if !f {
@@ -241,7 +235,6 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 		}
 	})
 
-	// Tags
 	companyTags := []TagDTOs{}
 	for _, tag := range dm.Tags {
 		tagUID, f := uuid.Parse(tag)
@@ -263,8 +256,6 @@ func NewTaskDTO(dm domain.Task, comments []domain.Comment, files []domain.File, 
 		_, f := uuid.Parse(t)
 		return f != nil
 	})
-
-	//
 
 	companyPriority := CompanyPriorityDTO{
 		Number: dm.Priority,

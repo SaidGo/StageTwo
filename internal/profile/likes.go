@@ -19,7 +19,7 @@ const (
 )
 
 func (s *Service) Like(userUUID uuid.UUID, entityType LikeEntityType, entityUUID uuid.UUID) error {
-	// @todo: trunaction?
+
 	key := fmt.Sprintf("user:%s:likes:%s", userUUID, entityType)
 	err := s.repo.rds.SAddString(context.Background(), key, entityUUID.String(), 300000)
 	if err != nil {
@@ -36,7 +36,7 @@ func (s *Service) Like(userUUID uuid.UUID, entityType LikeEntityType, entityUUID
 }
 
 func (s *Service) Dislike(userUUID uuid.UUID, entityType LikeEntityType, entityUUID uuid.UUID) error {
-	// @todo: trunaction?
+
 	key := fmt.Sprintf("user:%s:likes:%s", userUUID, entityType)
 	err := s.repo.rds.SRemString(context.Background(), key, entityUUID.String())
 	if err != nil {

@@ -23,13 +23,9 @@ type ILogService interface {
 	InsertLog(l Log) error
 }
 
-// ----------------------------
-
 func (s *LogService) InsertLog(l Log) error {
 	return s.repo.InsertLog(l)
 }
-
-// ----------------------------
 
 type SentryOptions struct {
 	Enable   bool
@@ -60,27 +56,17 @@ func InitLog(format, level string, sentryOptions SentryOptions) {
 	h := dbHook{}
 	logrus.AddHook(h)
 
-	//
-
 	initSentry(sentryOptions)
 }
 
 type Hook struct{}
 
-// Add a hook to an instance of logger. This is called with
-// `log.Hooks.Add(new(MyHook))` where `MyHook` implements the `Hook` interface.
-// nolint
 func (hooks Hook) Add(hook Hook) {
 }
 
-// Fire all the hooks for the passed level. Used by `entry.log` to fire
-// appropriate hooks for a log entry.
-// nolint
 func (hooks Hook) Fire(level logrus.Level, entry *logrus.Entry) error {
 	return nil
 }
-
-//
 
 type dbHook struct {
 	*sql.DB

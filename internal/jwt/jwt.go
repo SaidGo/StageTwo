@@ -22,8 +22,6 @@ const (
 var ErrTokenExpired = errors.New("время токена вышло")
 
 type IJWT interface {
-	// Generate jwt token
-	// minutes - how long token will be valid in minutes.
 	GenerateJWT(uuid.UUID, string, string, bool, int) string
 	GenerateRefreshToken(uuid.UUID, string, string, bool, int) (string, time.Time)
 

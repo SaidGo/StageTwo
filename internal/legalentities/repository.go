@@ -23,8 +23,6 @@ type repository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) Repository { return &repository{db: db} }
 
-// mapping
-
 func mapRowToDomain(r bankAccountRow) domain.BankAccount {
 	var le uuid.UUID
 	if r.LegalEntityUUID != nil {
@@ -71,8 +69,6 @@ func mapDomainToRow(d *domain.BankAccount) bankAccountRow {
 		IsPrimary:       d.IsPrimary,
 	}
 }
-
-// CRUD
 
 func (r *repository) CreateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error) {
 	row := mapDomainToRow(ba)

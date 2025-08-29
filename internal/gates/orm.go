@@ -24,7 +24,6 @@ type Permission struct {
 
 type JSON domain.PermissionRules
 
-// Scan scan value into Jsonb, implements sql.Scanner interface.
 func (j *JSON) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -37,7 +36,6 @@ func (j *JSON) Scan(value interface{}) error {
 	return err
 }
 
-// Value return json value, implement driver.Valuer interface.
 func (j JSON) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }

@@ -15,7 +15,6 @@ func (a *App) Run(addr string) error {
 	return a.Router.Run(addr)
 }
 
-// NewApp — принимает готовый роутер и сервисы.
 func NewApp(router *gin.Engine, leService legalentities.ServiceInterface) *App {
 	return &App{
 		Router:             router,

@@ -36,8 +36,6 @@ func (s *Service) GetProject(_ context.Context, uid uuid.UUID) (dto.ProjectDTO, 
 
 	responsibleBy, _ := s.dictionaryService.FindUser(dmn.ResponsibleBy)
 
-	//
-
 	statuses, err := s.federationService.GetProjectStatuses(dmn.UUID)
 	if err != nil {
 		return dto.ProjectDTO{}, err
@@ -63,7 +61,6 @@ func (s *Service) GetProject(_ context.Context, uid uuid.UUID) (dto.ProjectDTO, 
 			Error("status not found by number")
 	}
 
-	//
 	options := dto.ProjectOptionsDTO(dmn.Options)
 
 	dt := dto.ProjectDTO{

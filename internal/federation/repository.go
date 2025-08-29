@@ -348,7 +348,6 @@ func (r *Repository) GetProjectFields(projectUUID uuid.UUID) (orm []CompanyField
 func (r *Repository) GetCompanyFields(companyUUID uuid.UUID) (dmns []domain.CompanyField, err error) {
 	orm := []CompanyFields{}
 
-	// Company Fields
 	res := r.gorm.DB.Model(&orm).
 		Select("company_fields.uuid, company_fields.icon, company_fields.name, company_fields.description, company_fields.hash, company_fields.data_type, COALESCE(json_agg(distinct pf.project_uuid) FILTER (WHERE pf.project_uuid IS NOT NULL), '[]' ) as project_uuids,"+
 			"count(*) as tasks_total,"+
@@ -468,7 +467,6 @@ func (r *Repository) ProjectStatistic(companyUID, uid uuid.UUID) (orm ProjectSta
 		return orm, fs, err
 	}
 
-	// Statistics for Company Fields
 	fieldStatistics := []FieldStatistics{}
 	res := r.gorm.DB.Raw("with t as (select count(*) as total from tasks where project_uuid = ?) select (select name from company_fields cf where cf.hash = key and company_uuid = ?  limit 1 ) as name, key as hash, count(*), t.total, round(count(*)::decimal / t.total * 100, 2) as filled from tasks, jsonb_object_keys(fields) AS key left join t on 1 = 1 where tasks.project_uuid = ? AND tasks.fields->>key != '' group by key, jsonb_object_keys(fields), t.total", uid, companyUID, uid).Scan(&fieldStatistics)
 	if res.Error != nil {
@@ -1357,7 +1355,7 @@ func (r *Repository) GetUserGroups(userUUID uuid.UUID) (dms []domain.Group, err 
 
 func (r *Repository) GetUsersGroups(userUUIDs []uuid.UUID) (dms map[uuid.UUID][]domain.Group, err error) {
 	dms = make(map[uuid.UUID][]domain.Group)
-	// @todo: to one db request
+
 	for _, uid := range userUUIDs {
 		dm, err := r.GetUserGroups(uid)
 		if err != nil {
@@ -1456,8 +1454,6 @@ func (r *Repository) RemoveProjectField(projectUUID, companyFieldUUID uuid.UUID)
 
 	return err
 }
-
-///
 
 func (r *Repository) CreateProjectStatus(cp domain.ProjectStatus) (err error) {
 	orm := &ProjectStatus{}

@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-//nolint:revive // it is table name
 type CompanyTags struct {
 	UUID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();not null:false;primary_key:true"`
 	Name           string    `gorm:"type:varchar(100);default:'';not null"`
@@ -26,7 +25,6 @@ type CompanyTags struct {
 	DeletedAt *time.Time `gorm:"type:timestamptz;default:NULL;"`
 }
 
-//nolint:revive // it is table name
 type CompanyPriority struct {
 	UUID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();not null:false;primary_key:true"`
 	Name        string    `gorm:"type:varchar(100);default:'';not null"`

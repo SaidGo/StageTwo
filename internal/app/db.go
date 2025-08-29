@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// NewDB — фабрика БД, сигнатура совместима с wire_gen: (*gorm.DB, error)
+
 func NewDB() (*gorm.DB, error) {
 	dsn := os.Getenv("POSTGRES_DSN")
 	if dsn == "" {
-		return nil, fmt.Errorf("POSTGRES_DSN is empty; set e.g. postgres://postgres:Salavdi1@localhost:5432/go2part?sslmode=disable")
+		return nil, fmt.Errorf("POSTGRES_DSN is empty; set e.g. postgres:
 	}
 
 	cfg := &gorm.Config{

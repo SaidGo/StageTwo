@@ -18,8 +18,6 @@ func NewLogRepository(db *postgres.GDB) ILogRepository {
 	}
 }
 
-// ----------------------------
-
 func (r *LogRepository) InsertLog(l Log) error {
 	return r.gorm.DB.Create(&l).Error
 }

@@ -243,7 +243,6 @@ func (t *Task) PatchStatus(status int, opt ProjectOptions, comment string, sg *S
 
 	}
 
-	// @todo
 	sg.Current = fmt.Sprint(t.Status)
 
 	allowMove, p := CheckPathByValue(sg, fmt.Sprint(t.Status), fmt.Sprint(status))
@@ -277,7 +276,7 @@ func (t *Task) PatchStatus(status int, opt ProjectOptions, comment string, sg *S
 }
 
 type TaskManifest struct {
-	Fields map[string]string // key - field name, value - field type: Приоритет: int
+	Fields map[string]string
 }
 
 func (t *Task) SafeDirty(name string, val interface{}) {

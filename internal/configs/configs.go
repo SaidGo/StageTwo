@@ -19,22 +19,22 @@ func NewConfigsFromEnv() *Configs {
 	return o.loadFromEnv()
 }
 
-// nolint // uniq code style
+
 type Configs struct {
-	// ENV - dev, prod, test
+	
 	ENV string `env:"ENV" default:"prod"`
 
-	// DB
+	
 	DB_CREDS postgres.Creds `env:"DB_CREDS" secured:"true"`
 
-	// Redis
+	
 	REDIS_CREDS redis.Creds `env:"REDIS_CREDS" secured:"true"`
 
-	// SMTP
+	
 	SMTP_ENABLE bool   `env:"SMTP_ENABLE" envDefault:"true"`
 	SMTP_CREDS  string `env:"SMTP_CREDS" secured:"true"`
 
-	// APP
+	
 	GZIP                     int    `env:"GZIP" envDefault:"5"`
 	LOG_LEVEL                string `env:"LOG_LEVEL" envDefault:"debug"`
 	LOG_FORMAT               string `env:"LOG_FORMAT" envDefault:"plain"`
@@ -43,16 +43,16 @@ type Configs struct {
 	SOLT                     string `env:"SOLT" envDefault:"solt"`
 	TIME_ZONE                string `env:"TIME_ZONE" envDefault:"UTC"`
 	DICTIONARY_SYNC_INTERVAL int    `env:"DICTIONARY_SYNC_INTERVAL" envDefault:"10"`
-	URL_BACKEND              string `env:"URL_BACKEND" envDefault:"http://localhost:8080"`
+	URL_BACKEND              string `env:"URL_BACKEND" envDefault:"http:
 
-	// CDN
+	
 	CDN_PUBLIC_REGION            string `env:"CDN_PUBLIC_REGION" envDefault:"us-east-1"`
 	CDN_PUBLIC_ENDPOINT          string `env:"CDN_PUBLIC_ENDPOINT" envDefault:"storage.yandexcloud.net"`
 	CDN_PUBLIC_ACCESS_KEY_ID     string `env:"CDN_PUBLIC_ACCESS_KEY_ID" envDefault:""`
 	CDN_PUBLIC_SECRET_ACCESS_KEY string `env:"CDN_PUBLIC_SECRET_ACCESS_KEY" envDefault:"" secured:"true"`
 	CDN_PUBLIC_BUCKET_NAME       string `env:"CDN_PUBLIC_BUCKET_NAME" envDefault:""`
 	CDN_PUBLIC_SSL               bool   `env:"CDN_PUBLIC_SSL" envDefault:"true"`
-	CDN_PUBLIC_URL               string `env:"CDN_PUBLIC_URL" envDefault:"https://storage.yandexcloud.net"`
+	CDN_PUBLIC_URL               string `env:"CDN_PUBLIC_URL" envDefault:"https:
 
 	CDN_PRIVATE_REGION            string `env:"CDN_PRIVATE_REGION" envDefault:"us-east-1"`
 	CDN_PRIVATE_ENDPOINT          string `env:"CDN_PRIVATE_ENDPOINT" envDefault:"storage.yandexcloud.net"`
@@ -60,40 +60,40 @@ type Configs struct {
 	CDN_PRIVATE_SECRET_ACCESS_KEY string `env:"CDN_PRIVATE_SECRET_ACCESS_KEY" envDefault:"" secured:"true"`
 	CDN_PRIVATE_BUCKET_NAME       string `env:"CDN_PRIVATE_BUCKET_NAME" envDefault:""`
 	CDN_PRIVATE_SSL               bool   `env:"CDN_PRIVATE_SSL" envDefault:"true"`
-	CDN_PRIVATE_URL               string `env:"CDN_PRIVATE_URL" envDefault:"https://storage.yandexcloud.net"`
+	CDN_PRIVATE_URL               string `env:"CDN_PRIVATE_URL" envDefault:"https:
 
-	// Features
+	
 	SEED           bool   `env:"SEED" envDefault:"false"`
 	METRICS        bool   `env:"METRICS" envDefault:"true"`
 	MIGRATE        bool   `env:"MIGRATE" envDefault:"false"`
 	MIGRATE_FOLDER string `env:"MIGRATE_FOLDER" envDefault:"./migrations"`
 	RATE_LIMITER   int    `env:"RATE_LIMITER" envDefault:"20"`
 
-	// Sentry
+	
 	SENTRY_DSN    string `env:"SENTRY_DSN" secured:"true"`
 	SENTRY_ENABLE bool   `env:"SENTRY_ENABLE" envDefault:"false"`
 
-	// Telemetry
+	
 	OTEL_ENABLE   bool   `env:"OTEL_ENABLE" envDefault:"false"`
-	OTEL_EXPORTER string `env:"OTEL_EXPORTER" envDefault:"http://localhost:14268/api/traces"`
+	OTEL_EXPORTER string `env:"OTEL_EXPORTER" envDefault:"http:
 
-	// Cache
+	
 	CACHE_TASK            int `env:"CACHE_TASKS" envDefault:"15"`
 	CACHE_TASKS           int `env:"CACHE_TASKS" envDefault:"15"`
 	CACHE_PRE_SIGNED_URLS int `env:"CACHE_PRE_SIGNED_URLS" envDefault:"15"`
 
-	// HTTP
+	
 	PORT int `env:"PORT" envDefault:"8080"`
 
 	CORS_ENABLE            bool   `env:"CORS_ENABLE" envDefault:"false"`
 	CORS_ALLOW_CREDENTIALS bool   `env:"CORS_ALLOW_CREDENTIALS" envDefault:"false"`
 	CORS_ALLOWED_ORIGINS   string `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
 
-	// SMS
+	
 	SMS_API_ID string `env:"SMS_API_ID" secured:"true"`
 	SMS_FROM   string `env:"SMS_FROM" envDefault:"sector"`
 
-	// Integration
+	
 	MAX_EMAIL_MONTHS           int      `env:"MAX_EMAIL_MONTHS" envDefault:"1"`
 	EMAILS_INTEGRATION_ENABLED bool     `env:"EMAILS_INTEGRATION_ENABLED" envDefault:"false"`
 	KAFKA_BROKERS              []string `env:"KAFKA_BROKERS" envDefault:"kafka:9092"`

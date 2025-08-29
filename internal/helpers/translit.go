@@ -1,21 +1,10 @@
 package helpers
 
-// ////////////////////////////////////////////////////////////////////////////////// //
-//                                                                                    //
-//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
-//      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
-//                                                                                    //
-// ////////////////////////////////////////////////////////////////////////////////// //
-
 import (
 	"bytes"
 )
 
-// ////////////////////////////////////////////////////////////////////////////////// //
-
 type specProc func(p, c, n rune, extMap map[string]string) (string, bool)
-
-// ////////////////////////////////////////////////////////////////////////////////// //
 
 var baseRuEn = map[string]string{
 	"а": "a", "А": "A", "Б": "B", "б": "b", "В": "V", "в": "v", "Г": "G", "г": "g",
@@ -83,105 +72,69 @@ var bgnSpecial = map[string]string{
 	"е+": "ye", "Е+": "Ye", "ё+": "yë", "Ё+": "Yë",
 }
 
-// ////////////////////////////////////////////////////////////////////////////////// //
-
-// EncodeToScientific encodes text with scientific mappings
-//
-// Deprecated: Use Scientific method instead.
 func EncodeToScientific(text string) string {
 	return Scientific(text)
 }
 
-// EncodeToISO9A encodes text with ISO 9:1995/A ГОСТ 7.79-2000/A mappings
-//
-// Deprecated: Use ISO9A method instead.
 func EncodeToISO9A(text string) string {
 	return ISO9A(text)
 }
 
-// EncodeToISO9B encodes text with ISO 9:1995/B ГОСТ 7.79-2000/Б mappings
-//
-// Deprecated: Use ISO9B method instead.
 func EncodeToISO9B(text string) string {
 	return ISO9B(text)
 }
 
-// EncodeToBGN encodes text with BGN mappings
-//
-// Deprecated: Use BGN method instead.
 func EncodeToBGN(text string) string {
 	return BGN(text)
 }
 
-// EncodeToPCGN encodes text with PCGN mappings
-//
-// Deprecated: Use PCGN method instead.
 func EncodeToPCGN(text string) string {
 	return PCGN(text)
 }
 
-// EncodeToALALC encodes text with ALA-LC mappings
-//
-// Deprecated: Use ALALC method instead.
 func EncodeToALALC(text string) string {
 	return ALALC(text)
 }
 
-// EncodeToBS encodes text with BS 2979:1958 mappings
-//
-// Deprecated: Use BS method instead.
 func EncodeToBS(text string) string {
 	return BS(text)
 }
 
-// EncodeToBS encodes text with ICAO mappings
-//
-// Deprecated: Use Scientific method instead.
 func EncodeToICAO(text string) string {
 	return ICAO(text)
 }
 
-// Scientific encodes text with scientific mappings.
 func Scientific(text string) string {
 	return encode(text, scientificRuEn, nil)
 }
 
-// ISO9A encodes text with ISO 9:1995/A ГОСТ 7.79-2000/A mappings.
 func ISO9A(text string) string {
 	return encode(text, iso9ARuEn, nil)
 }
 
-// ISO9B encodes text with ISO 9:1995/B ГОСТ 7.79-2000/Б mappings.
 func ISO9B(text string) string {
 	return encode(text, iso9BRuEn, iso9BSpec)
 }
 
-// BGN encodes text with BGN mappings.
 func BGN(text string) string {
 	return encode(text, bgnRuEn, bgnSpec)
 }
 
-// PCGN encodes text with PCGN mappings.
 func PCGN(text string) string {
 	return encode(text, bgnRuEn, bgnSpec)
 }
 
-// ALALC encodes text with ALA-LC mappings.
 func ALALC(text string) string {
 	return encode(text, alalcRuEn, nil)
 }
 
-// BS encodes text with BS 2979:1958 mappings.
 func BS(text string) string {
 	return encode(text, bsRuEn, nil)
 }
 
-// ICAO encodes text with ICAO mappings.
 func ICAO(text string) string {
 	return encode(text, icaoRuEn, nil)
 }
-
-// ////////////////////////////////////////////////////////////////////////////////// //
 
 func encode(text string, extMap map[string]string, proc specProc) string {
 	if text == "" {
@@ -191,7 +144,6 @@ func encode(text string, extMap map[string]string, proc specProc) string {
 	input := bytes.NewBufferString(text)
 	output := bytes.NewBuffer(nil)
 
-	// Previous, next letter for special processor
 	var p, n rune
 	var rr string
 	var ok bool
@@ -268,7 +220,7 @@ func iso9BSpec(_, c, n rune, extMap map[string]string) (string, bool) {
 func bgnSpec(p, c, _ rune, _ map[string]string) (string, bool) {
 	switch c {
 	case 'е', 'Е', 'ё', 'Ё':
-		// nop
+
 	default:
 		return "", false
 	}

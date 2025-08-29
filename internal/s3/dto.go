@@ -32,7 +32,7 @@ func NewPhotoFile(path string, userUUID uuid.UUID, width int) (pf *PhotoFile, er
 
 	args := ""
 	if width != OriginalPhotoSize {
-		args = fmt.Sprintf("w%d", width) // w100
+		args = fmt.Sprintf("w%d", width) 
 	}
 
 	size, err := helpers.FileSize(path)
@@ -46,10 +46,10 @@ func NewPhotoFile(path string, userUUID uuid.UUID, width int) (pf *PhotoFile, er
 		return pf, err
 	}
 
-	// @todo: convert to jpg
+	
 	objectPath := fmt.Sprintf("photos-%s.%s.jpg", userUUID, args)
 	objectPath = strings.ReplaceAll(objectPath, "..", ".")
-	objectPath = strings.ReplaceAll(objectPath, "//", "/")
+	objectPath = strings.ReplaceAll(objectPath, "
 
 	return &PhotoFile{
 		UserUUID:    userUUID,
@@ -106,7 +106,7 @@ func NewFileDTO(fileName, path, objectName string, userUUID uuid.UUID) (pf *File
 
 	objectPath := fmt.Sprintf("%s.%s", name, ext)
 	objectPath = strings.ReplaceAll(objectPath, "..", ".")
-	objectPath = strings.ReplaceAll(objectPath, "//", "/")
+	objectPath = strings.ReplaceAll(objectPath, "
 
 	return &FileDTO{
 		UserUUID:   userUUID,

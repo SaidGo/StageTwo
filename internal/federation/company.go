@@ -61,8 +61,6 @@ func (s *Service) GetCompany(uid uuid.UUID) (dm domain.Company, err error) {
 
 	dm.Users = users
 
-	//
-
 	projects, err := s.repo.GetProjectsByCompany(uid)
 	if err != nil {
 		return dm, err

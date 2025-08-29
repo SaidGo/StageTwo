@@ -8,7 +8,7 @@ import (
 
 type BankAccount struct {
 	UUID            uuid.UUID
-	LegalEntityUUID uuid.UUID // uuid.Nil -> не привязан
+	LegalEntityUUID uuid.UUID
 	BIK             string
 	Bank            string
 	Address         string

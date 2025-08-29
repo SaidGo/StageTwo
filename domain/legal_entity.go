@@ -2,8 +2,6 @@ package domain
 
 import "time"
 
-// LegalEntity — доменная модель юрлица.
-// Расширено для 2.2: добавлены CompanyUUID и BankAccounts.
 type LegalEntity struct {
 	UUID         string        `json:"uuid"`
 	Name         string        `json:"name"`

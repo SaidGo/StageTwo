@@ -498,7 +498,7 @@ func (r *Repository) GetTasks(_ context.Context, filter dto.TaskSearchDTO, allow
 	}
 
 	if filter.Name != nil && len(*filter.Name) >= 1 {
-		// WHERE  name iLIKE 'My%' OR name LIKE '% My%'
+
 		query = query.Where("name iLIKE ? OR name iLIKE ?", *filter.Name+"%", "% "+*filter.Name+"%")
 	}
 
@@ -516,7 +516,7 @@ func (r *Repository) GetTasks(_ context.Context, filter dto.TaskSearchDTO, allow
 		for _, item := range filter.Fields {
 			logrus.Warn(item.Value)
 			logrus.Warn(item.Value)
-			// @todo: add regular to check array
+
 			if strings.HasPrefix(fmt.Sprintf("%v", item.Value), "@> [") && strings.HasSuffix(fmt.Sprintf("%v", item.Value), "]") {
 				v := strings.TrimPrefix(item.Value.(string), "@> ")
 				query = query.Where(" fields->? @> ?", item.Name, v)
@@ -631,22 +631,8 @@ func (r *Repository) GetParentLvl(federationUUID, projectUUID, uid uuid.UUID) (m
 }
 
 func (r *Repository) RemoveChildParent(federationUUID, projectUUID uuid.UUID, taskUUID string) (err error) {
-	// a,b,c,d
-	// a,b,c,d,e
-	// a,b
-
-	// a,b -> z,b
-
-	// z,b,c,d
-	// z,b,c,d,e
-	// z,b
 
 	err = r.gorm.DB.Exec("update tasks set path = subpath(path, index(path, ?)) where federation_uuid = ? and project_uuid = ? and path ~ ? ", taskUUID, federationUUID, projectUUID, "*."+taskUUID+".*").Error
-
-	// @total: 1 fix reset all caches
-	// if err != nil {
-	// 	r.ResetCache(uuid)
-	// }
 
 	return err
 }
@@ -721,16 +707,6 @@ func (r *Repository) UpdateChildTotal(taskUUID uuid.UUID) (mp map[uuid.UUID]int6
 
 		go r.ResetCache(u)
 	}
-
-	// a.b.c.d #d
-	// a.b.c.d.e.z #z
-	// a.i.o.p #p
-	// a.i
-	// a.i.o
-	// a.b.c
-	// a.b
-	// a
-	// a.b.c.d.e
 
 	return mp, err
 }

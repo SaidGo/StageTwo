@@ -28,7 +28,6 @@ func NewRepository(rds *redis.RDS) *Repository {
 	}
 }
 
-// Task.
 func (r *Repository) StoreTaskState(email, kindWithUUID string, state aggregates.StateDiff) error {
 	key := fmt.Sprintf("notifications:%s:%s", email, kindWithUUID)
 
@@ -42,8 +41,6 @@ func (r *Repository) StoreTaskState(email, kindWithUUID string, state aggregates
 		return err
 	}
 
-	//
-
 	lastOpen, err := r.rds.HGet(context.Background(), key, "last_open")
 	if err != nil {
 		return err
@@ -55,8 +52,6 @@ func (r *Repository) StoreTaskState(email, kindWithUUID string, state aggregates
 			return err
 		}
 	}
-
-	//
 
 	key = fmt.Sprintf("notifications:%s", email)
 	score := state.UpdatedAt.UnixMicro()

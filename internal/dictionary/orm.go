@@ -122,7 +122,6 @@ type ProjectFields struct {
 
 type UUIDArray []uuid.UUID
 
-// Scan scan value into Jsonb, implements sql.Scanner interface.
 func (j *UUIDArray) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -135,7 +134,6 @@ func (j *UUIDArray) Scan(value interface{}) error {
 	return err
 }
 
-// Value return json value, implement driver.Valuer interface.
 func (j UUIDArray) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
@@ -163,7 +161,6 @@ type CompanyPriority struct {
 
 type IntArray []int
 
-// Scan scan value into Jsonb, implements sql.Scanner interface.
 func (j *IntArray) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -176,7 +173,6 @@ func (j *IntArray) Scan(value interface{}) error {
 	return err
 }
 
-// Value return json value, implement driver.Valuer interface.
 func (j IntArray) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }

@@ -124,7 +124,6 @@ func (r *Repository) DeleteTag(uid uuid.UUID) (err error) {
 
 	r.PubUpdate()
 
-	// Remove tag from tasks
 	uuids := []uuid.UUID{}
 	err = r.gorm.DB.Raw("update tasks set tags = array_remove(tags, ?) where ? = ANY(tags) RETURNING uuid", uid.String(), uid.String()).Scan(&uuids).Error
 	if res.Error != nil {
@@ -137,8 +136,6 @@ func (r *Repository) DeleteTag(uid uuid.UUID) (err error) {
 
 	return err
 }
-
-///
 
 func (r *Repository) CreateCompanyPriority(cp domain.CompanyPriority) (err error) {
 	orm := &CompanyPriority{}

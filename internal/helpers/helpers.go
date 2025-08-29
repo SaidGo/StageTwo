@@ -86,7 +86,7 @@ func UUID() string { return uuid.New().String() }
 
 func UID() uuid.UUID { return uuid.New() }
 
-// ВАЖНО: generic-сравнение только для упорядочиваемых типов.
+
 func Min[T constraints.Ordered](a, b T) T {
 	if a < b {
 		return a
@@ -144,13 +144,13 @@ func RandomFromSlice[T any](arr []T) (bool, T) {
 	if len(arr) == 1 {
 		return false, arr[0]
 	}
-	//nolint:gosec // псевдослучайность для утилитарных нужд ок
+	
 	idx := rand.Intn(len(arr))
 	return true, arr[idx]
 }
 
 func RandomNumber(min, max int) int {
-	//nolint:gosec
+	
 	return rand.Intn(max) + min
 }
 
@@ -176,7 +176,7 @@ func GetType(s interface{}) string {
 	return t.Name()
 }
 
-// Return sorted keys.
+
 func SortMapByKeys[T constraints.Ordered](mp map[T]any) []T {
 	keys := make([]T, 0, len(mp))
 	for k := range mp {
@@ -193,8 +193,8 @@ func RemoveTagsFromString(s string) string {
 
 func ConvertPostgresCreds(creds string) (string, error) {
 	logrus.Debug(creds)
-	// postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable...
-	pattern := regexp.MustCompile(`postgres://(?P<user>[^:]+):(?P<password>[^@]+)@(?P<host>[^:]+):(?P<port>[^/]+)/(?P<dbname>[^?]+)(\?sslmode=(?P<sslmode>[^&]+)&sslrootcert=(?P<sslrootcert>[^&]+))*`)
+	
+	pattern := regexp.MustCompile(`postgres:
 	sub := pattern.FindStringSubmatch(creds)
 	if len(sub) < 6 {
 		logrus.Debug("postgres creds", sub)
@@ -255,7 +255,7 @@ func RandomCode(length int) string {
 	letters := []rune("abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, length)
 	for i := range b {
-		//nolint:gosec
+		
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
@@ -265,7 +265,7 @@ func RandomNumCode(length int) string {
 	letters := []rune("123456789")
 	b := make([]rune, length)
 	for i := range b {
-		//nolint:gosec
+		
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
@@ -406,7 +406,7 @@ func PatchPath(parent, current string, path []string) []string {
 
 func Unique[T comparable](arr []T) []T { return lo.Uniq(arr) }
 
-// Память процесса.
+
 func PrintMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)

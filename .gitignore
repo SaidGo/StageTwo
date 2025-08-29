@@ -1,5 +1,3 @@
-# перезаписать .gitignore чистой версией
-cat > .gitignore <<'EOF'
 # Go build artifacts
 /bin/
 /dist/
@@ -51,6 +49,7 @@ Study.study.json
 
 # Backup / temp files
 *.bak
+*.bak_old
 *.tmp
 ~$*
 
@@ -67,8 +66,3 @@ migrations_disabled/
 
 # OpenAPI generator temp
 openapi/.openapi
-EOF
-# backups / temps
-*.bak
-*.bak_old
-*.tmp

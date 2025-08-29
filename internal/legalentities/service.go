@@ -3,48 +3,43 @@ package legalentities
 import (
 	"context"
 
-	"example.com/local/Go2part/domain"
+	"github.com/google/uuid"
+
+	"example.com/local/Go2part/dto"
 )
 
 type ServiceInterface interface {
-	CreateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error)
-	ListAllBankAccounts(ctx context.Context) ([]domain.BankAccount, error)
-	GetBankAccount(ctx context.Context, uuid string) (domain.BankAccount, error)
-	UpdateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error)
-	DeleteBankAccount(ctx context.Context, uuid string) error
-
-	// связь с юрлицом
-	ListBankAccounts(ctx context.Context, leUUID string) ([]domain.BankAccount, error)
+	ListLegalEntities(ctx context.Context) ([]dto.LegalEntity, error)
+	CreateLegalEntity(ctx context.Context, in dto.LegalEntityCreate) (dto.LegalEntity, error)
+	GetLegalEntity(ctx context.Context, id uuid.UUID) (dto.LegalEntity, error)
+	UpdateLegalEntity(ctx context.Context, id uuid.UUID, in dto.LegalEntityUpdate) (dto.LegalEntity, error)
+	DeleteLegalEntity(ctx context.Context, id uuid.UUID) error
 }
 
 type Service struct {
 	repo Repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{repo: r}
+func NewService(repo Repository) *Service {
+	return &Service{repo: repo}
 }
 
-func (s *Service) CreateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error) {
-	return s.repo.CreateBankAccount(ctx, ba)
+func (s *Service) ListLegalEntities(ctx context.Context) ([]dto.LegalEntity, error) {
+	return s.repo.List(ctx)
 }
 
-func (s *Service) ListAllBankAccounts(ctx context.Context) ([]domain.BankAccount, error) {
-	return s.repo.ListAllBankAccounts(ctx)
+func (s *Service) CreateLegalEntity(ctx context.Context, in dto.LegalEntityCreate) (dto.LegalEntity, error) {
+	return s.repo.Create(ctx, in)
 }
 
-func (s *Service) GetBankAccount(ctx context.Context, uuid string) (domain.BankAccount, error) {
-	return s.repo.GetBankAccount(ctx, uuid)
+func (s *Service) GetLegalEntity(ctx context.Context, id uuid.UUID) (dto.LegalEntity, error) {
+	return s.repo.Get(ctx, id)
 }
 
-func (s *Service) UpdateBankAccount(ctx context.Context, ba *domain.BankAccount) (domain.BankAccount, error) {
-	return s.repo.UpdateBankAccount(ctx, ba)
+func (s *Service) UpdateLegalEntity(ctx context.Context, id uuid.UUID, in dto.LegalEntityUpdate) (dto.LegalEntity, error) {
+	return s.repo.Update(ctx, id, in)
 }
 
-func (s *Service) DeleteBankAccount(ctx context.Context, uuid string) error {
-	return s.repo.DeleteBankAccount(ctx, uuid)
-}
-
-func (s *Service) ListBankAccounts(ctx context.Context, leUUID string) ([]domain.BankAccount, error) {
-	return s.repo.ListBankAccounts(ctx, leUUID)
+func (s *Service) DeleteLegalEntity(ctx context.Context, id uuid.UUID) error {
+	return s.repo.Delete(ctx, id)
 }

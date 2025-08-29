@@ -14,7 +14,7 @@ type StatusGraph struct {
 }
 
 func NewStatusGraph(v string) *StatusGraph {
-	// parse value
+
 	if v != "*" {
 		i, err := strconv.Atoi(v)
 		if err != nil {

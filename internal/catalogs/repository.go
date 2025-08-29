@@ -377,12 +377,12 @@ func (r *Repository) GetData(filter dto.CatalogSearchDTO, allowSort []string) (d
 	if len(filter.Fields) > 0 {
 		queryWhere := r.gorm.DB
 		for _, item := range filter.Fields {
-			// @todo: add regular to check array
+
 			if strings.HasPrefix(fmt.Sprintf("%v", item.Value), "@> [") && strings.HasSuffix(fmt.Sprintf("%v", item.Value), "]") {
 				v := strings.TrimPrefix(item.Value.(string), "@> ")
 				queryWhere = queryWhere.Where(" fields->? @> ?", item.Name, v)
 			} else {
-				// @todo: add ilike search
+
 				v := strings.ReplaceAll(fmt.Sprintf("%v", item.Value), "%", "")
 				queryWhere = queryWhere.Where("fields->>? ilike ?", item.Name, v+"%")
 			}
@@ -413,7 +413,6 @@ func (r *Repository) GetData(filter dto.CatalogSearchDTO, allowSort []string) (d
 		}
 	}
 
-	// @todo: add federation limit
 	query = query.Raw(` 
 			with rich as (
 			SELECT 

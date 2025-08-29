@@ -15,9 +15,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//
 
-// Validations.
+
+
 var validate22 *validator.Validate = validator.New()
 
 func ValidateEmail(s string) error {
@@ -56,7 +56,7 @@ func ValidateColor(color string) error {
 
 func HTTPSValidation(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	return strings.HasPrefix(value, "https://")
+	return strings.HasPrefix(value, "https:
 }
 
 func TrimValidation(fl validator.FieldLevel) bool {
@@ -116,8 +116,8 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 
 	uni := ut.New(russian, russian)
 
-	// this is usually know or extracted from http 'Accept-Language' header
-	// also see uni.FindTranslator(...)
+	
+	
 	trans, found := uni.GetTranslator("ru")
 	if !found {
 		logrus.Error("translator not found")
@@ -136,7 +136,7 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 	}
 
 	err = validate.RegisterTranslation("trim", trans, func(ut ut.Translator) error {
-		return ut.Add("trim", "нужно убрать пробелы", true) // see universal-translator for details
+		return ut.Add("trim", "нужно убрать пробелы", true) 
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, err := ut.T("trim", fe.Field(), fe.Param())
 		if err != nil {
@@ -149,14 +149,14 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	// Color
+	
 	err = validate.RegisterValidation("color", ColorValidation)
 	if err != nil {
 		logrus.Error(err)
 	}
 
 	err = validate.RegisterTranslation("color", trans, func(ut ut.Translator) error {
-		return ut.Add("color", "цвет должен быть #000000 - #999999", true) // see universal-translator for details
+		return ut.Add("color", "цвет должен быть #000000 - #999999", true) 
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, err := ut.T("color", fe.Field(), fe.Param())
 		if err != nil {
@@ -169,14 +169,14 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	// Name
+	
 	err = validate.RegisterValidation("name", NameValidation)
 	if err != nil {
 		logrus.Error(err)
 	}
 
 	err = validate.RegisterTranslation("name", trans, func(ut ut.Translator) error {
-		return ut.Add("name", "название а-Я и цифры 0-9", true) // see universal-translator for details
+		return ut.Add("name", "название а-Я и цифры 0-9", true) 
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, err := ut.T("name", fe.Field(), fe.Param())
 		if err != nil {
@@ -189,7 +189,7 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	// Legal entity
+	
 	err = validate.RegisterValidation("legal_entity_field", ValidateLegalEntityField)
 	if err != nil {
 		logrus.Error(err)
@@ -214,9 +214,9 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	// Registrer email
+	
 	err = validate.RegisterTranslation("email", trans, func(ut ut.Translator) error {
-		return ut.Add("email", "Почта должна быть действительной", true) // see universal-translator for details
+		return ut.Add("email", "Почта должна быть действительной", true) 
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, err := ut.T("email", fe.Field(), fe.Param())
 		if err != nil {
@@ -229,14 +229,14 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	// Registrer optional email
+	
 	err = validate.RegisterValidation("optional_email", OptionalEmailValidation)
 	if err != nil {
 		logrus.Error(err)
 	}
 
 	err = validate.RegisterTranslation("optional_email", trans, func(ut ut.Translator) error {
-		return ut.Add("optional_email", "Почта должна быть действительной или пустой", true) // see universal-translator for details
+		return ut.Add("optional_email", "Почта должна быть действительной или пустой", true) 
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, err := ut.T("optional_email", fe.Field(), fe.Param())
 		if err != nil {
@@ -249,17 +249,17 @@ func ValidationStruct[T any](str T, fields ...string) ([]string, bool) {
 		logrus.Error(err)
 	}
 
-	//
+	
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("ru"), ",", 2)[0]
-		// skip if tag key says it should be ignored
+		
 		if name == "-" {
 			return ""
 		}
 		return name
 	})
 
-	//
+	
 	if len(fields) > 0 {
 		err = validate.StructPartial(str, fields...)
 	} else {

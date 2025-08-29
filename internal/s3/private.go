@@ -22,7 +22,7 @@ type ServicePrivate struct {
 	accessKeyID     string
 	secretAccessKey string
 	bucketName      string
-	location        string // "ru-central1"
+	location        string
 	useSSL          bool
 	publicURL       string
 	backendURL      string
@@ -132,7 +132,6 @@ func (s3 *ServicePrivate) uploadFile(file File, filePath string) (File, error) {
 
 	ctx := context.Background()
 
-	// Initialize minio client object.
 	minioClient, err := minio.New(s3.endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3.accessKeyID, s3.secretAccessKey, ""),
 		Secure: s3.useSSL,
@@ -230,7 +229,7 @@ func (s3 *ServicePrivate) Rename(fileUUID uuid.UUID, name string) error {
 }
 
 func (s3 *ServicePrivate) PresignedURL(name, objectName string) (res string, err error) {
-	// Initialize minio client object.
+
 	minioClient, err := minio.New(s3.endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3.accessKeyID, s3.secretAccessKey, ""),
 		Secure: s3.useSSL,
@@ -327,7 +326,6 @@ func (s3 *ServicePrivate) GetCommentFiles(uid uuid.UUID, openImages bool) (dmns 
 	}), err
 }
 
-// @todo: in poc.
 func (s3 *ServicePrivate) DangerousWipeS3FederationData(existFederations []domain.Federation) (uids []string, err error) {
 	minioClient, err := minio.New(s3.endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3.accessKeyID, s3.secretAccessKey, ""),

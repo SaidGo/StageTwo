@@ -33,7 +33,6 @@ func (s *Service) GetProjectFields(uid uuid.UUID) (items []domain.CompanyField, 
 		return items, err
 	}
 
-	// @todo
 	items = helpers.Map[CompanyFields, domain.CompanyField](orm, func(item CompanyFields, index int) domain.CompanyField {
 		return domain.CompanyField{
 			UUID:               item.UUID,
