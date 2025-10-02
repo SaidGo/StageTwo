@@ -1,0 +1,44 @@
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+*.iml
+.idea/
+.vscode/
+.fleet/
+
+# === Go ===
+/bin/
+/dist/
+/build/
+/out/
+/coverage/
+*.coverprofile
+*.test
+go.work
+go.work.sum
+
+# === Logs & dumps ===
+*.log
+*.tmp
+*.swp
+*.swm
+*.swo
+
+# === Backups / temp ===
+*.bak
+*.bak.*
+*.bak2
+*~
+*.orig
+*.rej
+
+# === Tools / containers ===
+.env
+/.terraform/
+/node_modules/
+
+# === Local archives ===
+*.zip
+*.7z
+*.tar
+*.tar.gz

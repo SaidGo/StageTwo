@@ -1,0 +1,36 @@
+{
+  "uid": "go2part-prom",
+  "title": "Go2part — Legal Entities & Bank Accounts",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Total requests (counters)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"refId": "A", "expr": "legal_entities_requests_total"},
+        {"refId": "B", "expr": "bank_accounts_requests_total"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "options": {"legend": {"displayMode": "list", "placement": "right"}}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Requests per second (rate 1m)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"refId": "A", "expr": "rate(legal_entities_requests_total[1m])"},
+        {"refId": "B", "expr": "rate(bank_accounts_requests_total[1m])"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "req/s"}, "overrides": []},
+      "options": {"legend": {"displayMode": "list", "placement": "right"}}
+    }
+  ],
+  "templating": {"list": []},
+  "time": {"from": "now-15m", "to": "now"}
+}

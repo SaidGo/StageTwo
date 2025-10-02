@@ -1,0 +1,11 @@
+services:
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    ports:
+      - "9100:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+      SERVER_PORT: "9000"
+      JVM_OPTS: "-Xms64M -Xmx128M"
+    depends_on:
+      - kafka

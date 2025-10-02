@@ -1,0 +1,7 @@
+{ "dashboard": { "title": "Go2part — Legal Entities & Bank Accounts", "timezone": "browser", "refresh": "5s", "schemaVersion": 38, "version": 1, "time": { "from": "now-15m", "to": "now" },
+"panels": [
+{ "id": 1, "type": "stat", "title": "Total legal_entities_requests_total", "gridPos": { "h": 4, "w": 12, "x": 0, "y": 0 }, "targets": [ { "refId": "A", "expr": "sum(legal_entities_requests_total)", "datasource": { "type": "prometheus", "uid": "PROM" } } ] },
+{ "id": 2, "type": "stat", "title": "Total bank_accounts_requests_total", "gridPos": { "h": 4, "w": 12, "x": 12, "y": 0 }, "targets": [ { "refId": "A", "expr": "sum(bank_accounts_requests_total)", "datasource": { "type": "prometheus", "uid": "PROM" } } ] },
+{ "id": 3, "type": "timeseries", "title": "RPS — legal_entities (rate[1m])", "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 }, "targets": [ { "refId": "A", "expr": "sum(rate(legal_entities_requests_total[1m]))", "legendFormat": "legal_entities", "datasource": { "type": "prometheus", "uid": "PROM" } } ] },
+{ "id": 4, "type": "timeseries", "title": "RPS — bank_accounts (rate[1m])", "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 }, "targets": [ { "refId": "A", "expr": "sum(rate(bank_accounts_requests_total[1m]))", "legendFormat": "bank_accounts", "datasource": { "type": "prometheus", "uid": "PROM" } } ] }
+] }, "overwrite": true, "folderId": 0 }
